@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Font Awesome and Swiper -->
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Eventbrite System</title>
+</head>
+<style>
+    html { scroll-behavior: smooth; }
+
+    .ham.active .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .ham.active .bar:nth-child(2) { opacity: 0; }
+    .ham.active .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .bar { transition: all 0.3s ease; }
+
+    @media (max-width: 767px) {
+      nav {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 200;
+        background-color: white;
+        padding: 15px;
+        line-height: 1.5em;
+      }
+
+      .image { position: absolute; top: 15px; left: 5px; }
+      .ham { position: absolute; top: 22px; right: 10px; }
+
+      .nav-menu {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background-color: white;
+      }
+
+      .nav-menu.active { display: flex; }
+    }
+</style>
+
+<body class="focus:outline-none focus:ring-0 select-none">
+
+<!-- Main Navigation -->
+<nav class="bg-white w-full px-4 shadow-sm z-[999] md:relative fixed top-0 left-0 right-0 md:static">
+    <div class="flex justify-between items-center py-2 max-w-7xl mx-auto">
+        <!-- Logo -->
+        <img th:src="@{/images/ev0.png}" class="w-28 ml-4" alt="Logo">
+
+        <!-- Navigation Links -->
+        <ul id="nav-menu" class="nav-menu hidden absolute top-full right-0 bg-white md:bg-transparent md:static md:flex md:flex-row md:items-center md:space-x-2 text-gray-700 font-medium px-6 py-4 md:p-0 md:space-x-4">
+            <li><a th:href="@{/contact-sales}" class="block px-3 py-2 hover:bg-gray-200 rounded-md transition-all">Contact Sales</a></li>
+            <li><a th:href="@{/create-event}" class="block px-3 py-2 hover:bg-gray-200 rounded-md transition-all">Create Events</a></li>
+            <li><a th:href="@{/view-events}" class="block px-3 py-2 hover:bg-gray-200 rounded-md transition-all">View Events</a></li>
+
+            <!-- Help Center Dropdown -->
+            <li class="relative group">
+                <button onclick="toggleDropdown('helpDropdown')" class="block px-3 py-2 hover:bg-gray-200 rounded-md transition-all flex items-center gap-1">
+                    Help Center <i class="fas fa-chevron-down text-sm ml-1"></i>
+                </button>
+                <ul id="helpDropdown" class="hidden absolute right-0 mt-2 bg-white border rounded-md shadow-lg text-sm z-[9999] w-52">
+                    <li><a th:href="@{/help}" class="block px-4 py-2 hover:bg-gray-100">Help Center</a></li>
+                    <li><a th:href="@{/tickets}" class="block px-4 py-2 hover:bg-gray-100">Find Your Tickets</a></li>
+                    <li><a th:href="@{/contact-organizer}" class="block px-4 py-2 hover:bg-gray-100">Contact Organizer</a></li>
+                </ul>
+            </li>
+
+            <li><a th:href="@{/login}" class="block px-3 py-2 hover:bg-gray-200 rounded-md transition-all">Log In</a></li>
+            <li><a th:href="@{/signup}" class="block px-3 py-2 hover:bg-gray-100 rounded-md transition-all">Sign Up</a></li>
+        </ul>
+
+        <!-- Hamburger Menu -->
+        <button class="md:hidden mr-4 ham" onclick="toggleMobileNav()">
+            <span class="bar block w-6 h-0.5 bg-gray-600 mb-1 transition-all"></span>
+            <span class="bar block w-6 h-0.5 bg-gray-600 mb-1 transition-all"></span>
+            <span class="bar block w-6 h-0.5 bg-gray-600 transition-all"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Desktop Only Secondary Nav -->
+<header class="hidden md:block sticky top-0 bg-blue-950 shadow-md py-4 z-50">
+    <div class="max-w-7xl mx-auto flex justify-center items-center gap-8 text-white text-base relative">
+        <a th:href="@{/organizer}" class="hover:text-gray-300 hover:bg-blue-900 p-2 rounded-md font-bold transition-colors">Organizer</a>
+
+        <!-- Dropdown Menus -->
+        <div class="relative">
+            <button onclick="toggleDropdown('Industry')" class="flex items-center gap-2 hover:text-gray-300 hover:bg-blue-900 p-2 rounded-md transition-colors">
+                Industry <i class="fas fa-chevron-down text-sm ml-1"></i>
+            </button>
+            <div id="Industry" class="absolute hidden bg-blue-950 text-gray-100 rounded-md shadow-lg mt-2 z-50 min-w-[180px]">
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Music</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Food & Beverage</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Performing Art</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Charity & Causes</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Retail</a>
+            </div>
+        </div>
+
+        <div class="relative">
+            <button onclick="toggleDropdown('solutionsMenu')" class="flex items-center gap-2 hover:text-gray-300 hover:bg-blue-900 p-2 rounded-md transition-colors">
+                Solutions <i class="fas fa-chevron-down text-sm ml-1"></i>
+            </button>
+            <div id="solutionsMenu" class="absolute hidden bg-blue-950 text-gray-100 rounded-md shadow-lg mt-2 z-50 min-w-[180px]">
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Ticketing</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Marketing Tools</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Analytics</a>
+            </div>
+        </div>
+
+        <div class="relative">
+            <button onclick="toggleDropdown('eventTypesMenu')" class="flex items-center gap-2 hover:text-gray-300 hover:bg-blue-900 p-2 rounded-md transition-colors">
+                Event Types <i class="fas fa-chevron-down text-sm ml-1"></i>
+            </button>
+            <div id="eventTypesMenu" class="absolute hidden bg-blue-950 text-gray-100 rounded-md shadow-lg mt-2 z-50 min-w-[180px]">
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Conferences</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Workshops</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Webinars</a>
+            </div>
+        </div>
+
+        <div class="relative">
+            <button onclick="toggleDropdown('Blog')" class="flex items-center gap-2 hover:text-gray-300 hover:bg-blue-900 p-2 rounded-md transition-colors">
+                Blog <i class="fas fa-chevron-down text-sm ml-1"></i>
+            </button>
+            <div id="Blog" class="absolute hidden bg-blue-950 text-gray-100 rounded-md shadow-lg mt-2 z-50 min-w-[180px]">
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Tips & Guides</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">News & Trends</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Community</a>
+                <a href="#" class="block px-4 py-2 hover:bg-blue-900">Tools & Features</a>
+            </div>
+        </div>
+
+        <a th:href="@{/resources}" class="hover:text-gray-300 hover:bg-blue-900 p-2 rounded-md transition-colors">Organizer Resource Hub</a>
+        <a th:href="@{/contact}" class="hover:text-gray-300 hover:bg-blue-900 p-2 rounded-md transition-colors">Contact</a>
+        <a th:href="@{/contact-sales}" class="hover:text-gray-300 hover:bg-blue-900 p-2 rounded-md transition-colors">Contact Sales</a>
+        <a th:href="@{/signup}" class="bg-blue-500 px-5 py-2 rounded-full hover:bg-blue-600 transition-colors font-medium">Get Started</a>
+    </div>
+</header>
+
+
+
+<div class="relative bg-cover bg-center bg-no-repeat flex items-center justify-center text-center"
+     th:style="'background-image: url(' + @{/images/ev1.jpg} + '); height: 500px;'">
+    <div class="bg-black bg-opacity-60 mx-4 sm:mx-10 p-6 sm:p-10 rounded-xl text-white">
+        <h2 class="text-3xl sm:text-5xl mb-4 font-bold">Join Our Community</h2>
+        <h2 class="text-xl sm:text-3xl font-semibold mb-2">
+            Power your growth with the best event management software
+        </h2>
+        <p class="text-sm sm:text-lg mb-6">
+            Eventbrite's all-in-one event management system empowers creators to increase their attendance,
+            engage their community, and create events with confidence
+        </p>
+
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a th:href="@{#}" class="bg-blue-500 px-6 py-3 rounded-md hover:bg-blue-600 transition-colors">Get Started</a>
+            <a th:href="@{#}" class="bg-gray-500 px-6 py-3 rounded-md hover:bg-gray-600 transition-colors">Learn More</a>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<section id="reviews" class="py-16 bg-blue-950">
+    <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-100 mb-12">
+        <span class="border-b-4 border-white pb-2">Client's Reviews</span>
+    </h1>
+
+    <div class="grid gap-8 px-4 max-w-6xl mx-auto sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Review Card 1 -->
+        <div class="bg-white rounded-xl shadow-md p-6 text-center">
+            <img th:src="@{images/z.png}" alt="Albert Dennis" class="w-24 h-24 mx-auto rounded-full mb-4 object-cover">
+            <h3 class="text-lg font-semibold text-gray-800" th:text="'Albert Dennis'">Albert Dennis</h3>
+            <p class="text-gray-600 mt-2 mb-4" th:text="'Eventbrite is a great platform for creating and managing events. It has a user-friendly interface and a wide range of features.'">Eventbrite is a great platform for creating and managing events. It has a user-friendly interface and a wide range of features.</p>
+            <div class="flex justify-center text-yellow-500">
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star-half-alt mx-0.5"></i>
+            </div>
+        </div>
+
+        <!-- Review Card 2 -->
+        <div class="bg-white rounded-xl shadow-md p-6 text-center">
+            <img th:src="@{images/z.png}" alt="Albert Dennis" class="w-24 h-24 mx-auto rounded-full mb-4 object-cover">
+            <h3 class="text-lg font-semibold text-gray-800" th:text="'Albert Dennis'">Albert Dennis</h3>
+            <p class="text-gray-600 mt-2 mb-4" th:text="'Managing events with Eventbrite has been a game-changer for me. It\'s user-friendly and has a wide range of features.'">Managing events with Eventbrite has been a game-changer for me. It's user-friendly and has a wide range of features.</p>
+            <div class="flex justify-center text-yellow-500">
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star-half-alt mx-0.5"></i>
+            </div>
+        </div>
+
+        <!-- Review Card 3 -->
+        <div class="bg-white rounded-xl shadow-md p-6 text-center">
+            <img th:src="@{images/z.png}" alt="Emmanuel Adu" class="w-24 h-24 mx-auto rounded-full mb-4">
+            <h3 class="text-lg font-semibold text-gray-800" th:text="'Emmanuel Adu'">Emmanuel Adu</h3>
+            <p class="text-gray-600 mt-2 mb-4" th:text="'Promoting events with Eventbrite has been a game-changer for me. It\'s user-friendly and has a wide range of features.'">Promoting events with Eventbrite has been a game-changer for me. It's user-friendly and has a wide range of features.</p>
+            <div class="flex justify-center text-yellow-500">
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star mx-0.5"></i>
+                <i class="fa fa-star-half-alt mx-0.5"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="bg-white m-20">
+    <h2 class="flex flex-col items-center justify-center text-4xl md:text-4xl font-bold text-center text-gray-800">Welcome to EventBrite</h2>
+    <br>
+    <h1 class="flex flex-col items-center justify-center text-3xl md:text-6xl font-bold text-center text-red-500">Transforming your event into a thriving business</h1>
+    <br>
+    <p class="flex flex-col items-center  mx-auto text-lg md:text-xl font-semibold text-center text-gray-600">At EventBrite, we believe that every event is an opportunity for growth and success. That's why we're committed to providing you with the tools and resources you need to make your event a success.
+        It attracts millions of people to your event, and we're here to help you make it happen.</p>
+</section>
+
+<section class="py-20 px-20 bg-white px-6">
+    <div class="flex flex-wrap justify-center gap-8">
+        <!-- Project Card -->
+        <div class="bg-gray-200 p-10 shadow-md w-80 hover:-translate-y-2 transition-transform">
+            <h1 class="text-xl font-bold mb-2" th:text="'An Event Management System built for growth'"> An Event Management System built for growth</h1>
+            <p class="text-gray-600 mb-4" th:text="'Eventbrite’s event planning system allows you to easily post and manage your virtual or in-person events on a trusted platform and elevate your brand.'">Eventbrite’s event planning system allows you to easily post and manage your virtual or in-person events on a trusted platform and elevate your brand.</p>
+            <a href="#" class="inline-block relative text-blue text-lg font-medium mt-4">
+                <span th:text="'Learn More'">Learn More</span>
+                <span class="block w-full h-0.5 bg-red-500 mt-2"></span>
+            </a>
+        </div>
+
+        <div class="bg-gray-200 p-10 shadow-md w-80 hover:-translate-y-2 transition-transform">
+            <h1 class="text-xl font-bold mb-2" th:text="'Reach a wider audience and grow your attendance'">Reach a wider audience and grow your attendance</h1>
+            <p class="text-gray-600 mb-4" th:text="'Tap into the world’s largest events marketplace and expand your reach with social media marketing tools using our exclusive data.'">Tap into the world’s largest events marketplace and expand your reach with social media marketing tools using our exclusive data.</p>
+            <a href="#" class="inline-block relative text-blue text-lg font-medium mt-4">
+                <span th:text="'Learn More'">Learn More</span>
+                <span class="block w-full h-0.5 bg-red-500 mt-2"></span>
+            </a>
+        </div>
+
+        <div class="bg-gray-200 p-10 shadow-md w-80 hover:-translate-y-2 transition-transform">
+            <h1 class="text-xl font-bold mb-2" th:text="'Engage and cultivate your community'">Engage and cultivate your community</h1>
+            <p class="text-gray-600 mb-4" th:text="'Stay connected to your attendees and keep them engaged with email marketing tools, notifications, and real-time insights that get results.'">Stay connected to your attendees and keep them engaged with email marketing tools, notifications, and real-time insights that get results.</p>
+            <a href="#" class="inline-block relative text-blue text-lg font-medium mt-4">
+                <span th:text="'Learn More'">Learn More</span>
+                <span class="block w-full h-0.5 bg-red-500 mt-2"></span>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="py-20 px-6 md:px-20 bg-gray-100">
+    <h1 class="text-4xl md:text-5xl font-bold text-center text-blue-950 mb-6" th:text="'An event management system built for growth'">
+        An event management system built for growth
+    </h1>
+
+    <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950 mb-12" th:text="'Eventbrite’s event planning system allows you to easily post and manage your virtual or in-person events on a trusted platform and elevate your brand.'">
+        Eventbrite’s event planning system allows you to easily post and manage your virtual or in-person events on a trusted platform and elevate your brand.
+    </h2>
+    <br>
+    <div class="flex flex-col md:flex-row items-start gap-8">
+        <!-- Left-aligned image -->
+        <div class="md:w-1/2 w-full mt-20">
+            <img th:src="@{images/ev3.png}" alt="Event Image" class="w-full object-contain">
+        </div>
+
+        <!-- Right-aligned stacked text -->
+        <div class="md:w-1/2 w-full flex flex-col mb-12 space-y-6 text-right">
+            <i class="fa fa-ticket text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950" th:text="'Event Creation and Ticketing tools'">Event Creation and Ticketing tools</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Everything you need to easily set up your own online ticketing system and start selling tickets online for virtual and in-person events of any size.'">
+                Everything you need to easily set up your own online ticketing system and start selling tickets online for virtual and in-person events of any size.
+            </p>
+            <i class="fa fa-video text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950" th:text="'Virtual Event'">Virtual Event</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Advanced online event management tools let you host interactive online event experiences that seamlessly integrate with Zoom, Facebook Live, YouTube, and more.'">
+                Advanced online event management tools let you host interactive online event experiences that seamlessly integrate with Zoom, Facebook Live, YouTube, and more.
+            </p>
+            <i class="fa fa-user text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950" th:text="'Customizable event page'">Customizable event page</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Save time and promote your entire calendar of events with a single automated campaign on Facebook and Instagram. Your ad automatically updates when you add events or sell out.'">
+                Save time and promote your entire calendar of events with a single automated campaign on Facebook and Instagram. Your ad automatically updates when you add events or sell out.
+            </p>
+        </div>
+    </div>
+
+    <div class="flex sm:flex-row justify-center">
+        <a href="#" class="bg-orange-500 px-6 py-3 rounded-md hover:bg-orange-600 transition-colors" th:text="'Grow your event'">Grow your event</a>
+    </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+<section class="py-20 px-6 md:px-20 bg-white">
+    <h1 class="text-4xl md:text-5xl font-bold text-center text-blue-950 mb-6" th:text="'Reach a wider audience and sell more tickets'">
+        Reach a wider audience and sell more tickets
+    </h1>
+
+    <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950 mb-12" th:text="'Tap into the world’s largest events marketplace and expand your reach with social media marketing tools using our exclusive data.'">
+        Tap into the world’s largest events marketplace and expand your reach with social media marketing tools using our exclusive data.
+    </h2>
+
+    <br>
+
+    <div class="flex flex-col md:flex-row mb-12 items-start gap-8">
+        <!-- Text on the left -->
+        <div class="md:w-1/2 w-full flex flex-col space-y-6 text-left">
+            <i class="fa fa-television text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl text-center font-semibold text-blue-950 mb-2" th:text="'Eventbrite Marketing Tools'">Eventbrite Marketing Tools</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Power your growth with our industry-leading event marketing platform, featuring time-saving social media ad tools, and reach your ideal audience with intelligent targeting and insights.'">
+                Power your growth with our industry-leading event marketing platform, featuring time-saving social media ad tools,
+                and reach your ideal audience with intelligent targeting and insights.
+            </p>
+
+            <i class="fa fa-bullhorn text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl text-center font-semibold text-blue-950 mb-2" th:text="'Sell on social'">Sell on social</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Share your events and sell tickets on Facebook and LinkedIn directly from your Eventbrite account. Enable more attendees to discover, purchase, and access their tickets to your events with a seamless online registration flow.'">
+                Share your events and sell tickets on Facebook and LinkedIn directly from your Eventbrite account.
+                Enable more attendees to discover, purchase, and access their tickets to your events with a seamless online registration flow.
+            </p>
+
+            <i class="fa fa-qrcode text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl text-center font-semibold text-blue-950 mb-2" th:text="'Automated multi-event ads'">Automated multi-event ads</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Provide a seamless checkout experience for your attendees with beautifully designed event pages, which allow for quick and secure online ticket purchases.'">
+                Provide a seamless checkout experience for your attendees with beautifully designed event pages,
+                which allow for quick and secure online ticket purchases.
+            </p>
+        </div>
+
+        <!-- Image on the right -->
+        <div class="md:w-1/2 w-full mt-20">
+            <img th:src="@{images/ev4.png}" alt="Event Image" class="w-full object-contain">
+        </div>
+    </div>
+
+    <div class="flex sm:flex-row justify-center">
+        <a href="#" class="bg-orange-500 px-6 py-3 rounded-md hover:bg-orange-600 transition-colors" th:text="'Create your event'">Create your event</a>
+    </div>
+</section>
+
+<section class="py-20 px-6 md:px-20 bg-gray-100">
+    <h1 class="text-4xl md:text-5xl font-bold text-center text-blue-950 mb-6" th:text="'Engage and cultivate your community'">
+        Engage and cultivate your community
+    </h1>
+
+    <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950 mb-12" th:text="'Stay connected to your attendees and keep them engaged with email marketing tools, notifications, and real-time insights that get results.'">
+        Stay connected to your attendees and keep them engaged with email marketing tools, notifications, and real-time insights that get results.
+    </h2>
+    <br>
+    <div class="flex flex-col md:flex-row items-start gap-8">
+        <!-- Left-aligned image -->
+        <div class="md:w-1/2 w-full mt-20">
+            <img th:src="@{images/ev5.png}" alt="Event Image" class="w-full object-contain">
+        </div>
+
+        <!-- Right-aligned stacked text -->
+        <div class="md:w-1/2 w-full flex flex-col mb-12 space-y-6 text-right">
+            <i class="fa fa-film text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950" th:text="'Email marketing tools'">Email marketing tools</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Use our tools to quickly and easily send emails to your community with no contact limits and up to 6,000 daily sends. Our open rates are 59% better than the industry average.'">
+                Use our tools to quickly and easily send emails to your community with no contact limits and up to 6,000 daily sends.
+                Our open rates are 59% better than the industry average.
+            </p>
+            <i class="fa fa-line-chart text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950" th:text="'Analytics and insights'">Analytics and insights</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Instantly discover where your sales are coming from and what campaigns are generating return on investment (ROI) with real-time analytics that enable smarter data-driven decisions.'">
+                Instantly discover where your sales are coming from and what campaigns are generating return on investment (ROI)
+                with real-time analytics that enable smarter data-driven decisions.
+            </p>
+            <i class="fa fa-handshake text-4xl text-center text-blue-950"></i>
+            <h2 class="text-xl md:text-2xl font-semibold text-center text-blue-950" th:text="'Automated event notifications'">Automated event notifications</h2>
+            <p class="text-gray-700 text-center leading-relaxed" th:text="'Keep your community engaged and your events top-of-mind with automated event reminders and updates when event-goers attend “Follow” or “Like” your events.'">
+                Keep your community engaged and your events top-of-mind with automated event reminders and updates when
+                event-goers attend “Follow” or “Like” your events.
+            </p>
+        </div>
+    </div>
+
+    <div class="flex sm:flex-row justify-center">
+        <a href="#" class="bg-orange-500 px-6 py-3 rounded-md hover:bg-orange-600 transition-colors" th:text="'Engage your community'">Engage your community</a>
+    </div>
+</section>
+
+
+
+
+
+<section class="text-center px-5 py-10 bg-blue-950">
+    <h2 class="text-xl md:text-2xl font-semibold mb-2 text-center text-gray-100" th:text="'IN 2022'">IN 2022</h2>
+    <h2 class="text-xl md:text-2xl font-semibold mb-2 text-center text-gray-100" th:text="'EVENTBRITE HELPED NEARLY'">EVENTBRITE HELPED NEARLY</h2>
+    <h1 class="text-4xl md:text-5xl font-bold md-4 text-center text-yellow-300 mb-6" th:text="'800K EVENTS CREATORS'">
+        800K EVENTS CREATORS
+    </h1>
+    <br>
+    <h2 class="text-xl md:text-2xl font-semibold mb-2 text-center text-gray-100" th:text="'TRANSACT MORE THAN'">TRANSACT MORE THAN</h2>
+    <h1 class="text-4xl md:text-5xl font-bold mb-2 text-center text-yellow-300 mb-6" th:text="'284M TOTAL TICKETS'">
+        284M TOTAL TICKETS
+    </h1>
+    <h2 class="text-xl md:text-2xl font-semibold mb-2 text-center text-gray-100" th:text="'ACROSS'">ACROSS</h2>
+    <h1 class="text-4xl md:text-5xl font-bold mb-2 text-center text-yellow-300 mb-6" th:text="'10M EVENTS IN NEARLY 180 COUNTRIES'">
+        10M EVENTS IN NEARLY 180 COUNTRIES
+    </h1>
+</section>
+
+
+
+
+
+
+
+<style>
+    @keyframes scroll-x {
+        0% {
+            transform: translateX(10%);
+        }
+        100% {
+            transform: translateX(-30%);
+        }
+    }
+
+    .scroll-container {
+        display: flex;
+        width: max-content;
+        animation: scroll-x 15s linear infinite;
+    }
+
+    .scroll-wrapper {
+        overflow: hidden;
+    }
+</style>
+
+<section class="py-20 px-6 text-center md:px-20 bg-gray-100">
+    <h1 class="text-4xl md:text-5xl font-bold text-center text-blue-950 mb-6" th:text="'Resources for event creators'">
+        Resources for event creators
+    </h1>
+
+    <div class="scroll-wrapper">
+        <div class="scroll-container">
+            <!-- Loop group -->
+            <div class="flex gap-8">
+                <!-- CARD TEMPLATE (repeat x6 for loop effect) -->
+                <div class="bg-gray-200 p-6 shadow-md w-96 h-70 flex flex-col justify-between rounded-lg hover:-translate-y-5 transition-transform">
+                    <div>
+                        <h2 class="text-xl font-bold mb-2 text-left" th:text="'See Eventbrite in action'">
+                            See Eventbrite in action
+                        </h2>
+                        <p class="text-gray-600 text-left text-sm leading-relaxed" th:text="'Check out all the ways we’re making it easier for you to create, promote, manage, and do more with your events. Breeze through your event planning checklist with immersive tutorials hosted by our subject matter experts.'">
+                            Check out all the ways we’re making it easier for you to create, promote, manage, and do more with your events.
+                            Breeze through your event planning checklist with immersive tutorials hosted by our subject matter experts.
+                        </p>
+                    </div>
+                    <a href="#" class="text-left text-blue-600 text-base font-medium mt-4">
+                        <span th:text="'Watch demo videos →'">Watch demo videos →</span>
+                        <span class="block w-full h-0.5 bg-red-500 mt-1"></span>
+                    </a>
+                </div>
+
+                <div class="bg-gray-200 p-6 shadow-md w-96 h-70 flex flex-col justify-between rounded-lg hover:-translate-y-2 transition-transform">
+                    <div>
+                        <h2 class="text-xl font-bold mb-2 text-left" th:text="'Be inspired by creator success stories'">
+                            Be inspired by creator success stories
+                        </h2>
+                        <p class="text-gray-600 text-left text-sm leading-relaxed" th:text="'From music festivals and fundraisers to gaming competitions and air guitar contests, discover how your peers are helping bring the world together through live experiences.'">
+                            From music festivals and fundraisers to gaming competitions and air guitar contests,
+                            discover how your peers are helping bring the world together through live experiences.
+                        </p>
+                    </div>
+                    <a href="#" class="text-left text-blue-600 text-base font-medium mt-4">
+                        <span th:text="'Explore creator stories →'">Explore creator stories →</span>
+                        <span class="block w-full h-0.5 bg-red-500 mt-1"></span>
+                    </a>
+                </div>
+
+                <div class="bg-gray-200 p-6 shadow-md w-96 h-70 flex flex-col justify-between rounded-lg hover:-translate-y-2 transition-transform">
+                    <div>
+                        <h2 class="text-xl font-bold mb-2 text-left" th:text="'Free event management apps to supercharge your events'">
+                            Free event management apps to supercharge your events
+                        </h2>
+                        <p class="text-gray-600 text-left text-sm leading-relaxed" th:text="'Enhance your event planning business with Eventbrite’s powerful integrations with apps like YouTube, Spotify, Salesforce, Mailchimp, HubSpot, SurveyMonkey, and more than 100 trusted apps.'">
+                            Enhance your event planning business with Eventbrite’s powerful integrations with apps like YouTube, Spotify,
+                            Salesforce, Mailchimp, HubSpot, SurveyMonkey, and more than 100 trusted apps.
+                        </p>
+                    </div>
+                    <a href="#" class="text-left text-blue-600 text-base font-medium mt-4">
+                        <span th:text="'Explore Marketplace →'">Explore Marketplace →</span>
+                        <span class="block w-full h-0.5 bg-red-500 mt-1"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+<br>
+<br>
+
+
+
+
+
+<section class="py-20 px-6 rounded-md md:px-20 bg-blue-950">
+    <div class="container mx-auto bg-gray-100">
+        <div class="flex justify-between items-center px-6 md:px-20 py-12 bg-gray-100">
+            <!-- Left Side -->
+            <div class="max-w-xl">
+                <h1 class="text-4xl md:text-4xl font-bold text-blue-950 mb-4" th:text="'Publish your events for free'">
+                    Publish your events for free
+                </h1>
+                <p class="text-gray-700 text-base" th:text="'Reach more people on the world\'s largest and most trusted events marketplace. Everything you need to host standout events and earn more.'">
+                    Reach more people on the world's largest and most trusted events marketplace.
+                    Everything you need to host standout events and earn more.
+                </p>
+            </div>
+
+            <!-- Right Side -->
+            <div>
+                <a href="#" class="bg-orange-500 text-white px-6 py-3 rounded-md hover:bg-orange-600 transition-colors" th:text="'Get Started for Free'">
+                    Get Started for Free
+                </a>
+            </div>
+
+        </div>
+        <hr class="mx-10 text-black">
+        <div class="flex flex-col md:flex-row justify-between gap-10 px-6 md:px-20 py-12 bg-gray-50">
+            <!-- Left Column -->
+            <div class="flex-1">
+                <h2 class="text-xl md:text-2xl font-semibold text-blue-950 mb-4" th:text="'The all-in-one toolkit to grow your events'">
+                    The all-in-one toolkit to grow your events
+                </h2>
+                <ul class="space-y-2 text-gray-700">
+                    <li><i class="fa-solid fa-check text-green-600 mr-2"></i><span th:text="'Flexible ticket types for in-person or online events'">Flexible ticket types for in-person or online events</span></li>
+                    <li><i class="fa-solid fa-check text-green-600 mr-2"></i><span th:text="'Integrated email and social media marketing tools'">Integrated email and social media marketing tools</span></li>
+                    <li><i class="fa-solid fa-check text-green-600 mr-2"></i><span th:text="'Secure and seamless attendee checkout'">Secure and seamless attendee checkout</span></li>
+                    <li><i class="fa-solid fa-check text-green-600 mr-2"></i><span th:text="'Payouts before your event'">Payouts before your event</span></li>
+                    <li><i class="fa-solid fa-check text-green-600 mr-2"></i><span th:text="'Detailed analytics and reporting'">Detailed analytics and reporting</span></li>
+                </ul>
+            </div>
+
+            <!-- Vertical Divider -->
+            <div class="hidden md:block w-px bg-gray-300 mx-6"></div>
+
+            <!-- Right Column -->
+            <div class="flex-1">
+                <h2 class="text-xl md:text-2xl font-semibold text-blue-950 mb-4" th:text="'Low fees for your attendees'">
+                    Low fees for your attendees
+                </h2>
+                <ul class="space-y-2 text-gray-700">
+                    <li><i class="fa fa-dot-circle text-orange-500 mr-2"></i><span th:text="'No fees for free events'">No fees for free events</span></li>
+                    <li><i class="fa fa-dot-circle text-orange-500 mr-2"></i><span th:text="'3.7% + $1.79 service fee per ticket'">3.7% + $1.79 service fee per ticket</span></li>
+                    <li><i class="fa fa-dot-circle text-orange-500 mr-2"></i><span th:text="'2.9% payment processing fee per order'">2.9% payment processing fee per order</span></li>
+                    <li><i class="fa fa-dot-circle text-orange-500 mr-2"></i><span th:text="'Ticketing fees are paid by buyers unless you choose to cover them'">Ticketing fees are paid by buyers unless you choose to cover them</span></li>
+                </ul>
+                <a href="#" class="inline-block mt-4 text-blue-600 font-medium hover:underline" th:text="'Find out more about how fees work'">
+                    Find out more about how fees work
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<br>
+<br>
+
+<section class="flex flex-col md:flex-row items-center justify-between gap-10 px-6 md:px-20 py-12 bg-white">
+    <!-- Left Content -->
+    <div class="flex-1 max-w-xl">
+        <h1 class="text-4xl md:text-5xl font-bold text-blue-950 mb-4" th:text="'Grow eventfully'">
+            Grow eventfully
+        </h1>
+        <p class="text-gray-700 mb-6" th:text="'Explore all the event management tools and technology you need to start, run, and grow your business with events.'">
+            Explore all the event management tools and technology you need to start, run,
+            and grow your business with events.
+        </p>
+        <div class="flex gap-4">
+            <a href="#" class="bg-orange-500 text-white px-8 py-3 rounded-md hover:bg-orange-600 transition-colors" th:text="'Get Started for free'">
+                Get Started for free
+            </a>
+            <a href="#" class="bg-gray-300 text-gray-800 px-8 py-3 rounded-md hover:bg-gray-400 transition-colors" th:text="'Contact Sales'">
+                Contact Sales
+            </a>
+        </div>
+    </div>
+
+    <!-- Right Image -->
+    <div class="flex-1">
+        <img th:src="@{images/ev2.jpg}" alt="Event illustration" class="w-full rounded-lg h-auto object-contain" />
+    </div>
+</section>
+
+<!-- Main Footer Section -->
+<section class="bg-blue-950 text-white py-12 px-6 md:px-20">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+
+        <!-- Locations -->
+        <div>
+            <h3 class="text-lg font-semibold mb-4" th:text="'Our Locations'">Our Locations</h3>
+            <ul class="space-y-2 text-gray-300">
+                <li><i class="fa fa-map-marker mr-2 text-orange-400"></i><span th:text="'Takoradi'">Takoradi</span></li>
+                <li><i class="fa fa-map-marker mr-2 text-orange-400"></i><span th:text="'Kwesimintim'">Kwesimintim</span></li>
+            </ul>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+            <h3 class="text-lg font-semibold mb-4" th:text="'Quick Links'">Quick Links</h3>
+            <ul class="space-y-2 text-gray-300">
+                <li><a href="index.html" class="hover:text-white"><i class="fa fa-arrow-right mr-2"></i><span th:text="'Home'">Home</span></a></li>
+                <li><a href="About.html" class="hover:text-white"><i class="fa fa-arrow-right mr-2"></i><span th:text="'About'">About</span></a></li>
+                <li><a href="Donate.html" class="hover:text-white"><i class="fa fa-arrow-right mr-2"></i><span th:text="'Donate'">Donate</span></a></li>
+                <li><a href="Gallary.html" class="hover:text-white"><i class="fa fa-arrow-right mr-2"></i><span th:text="'Gallery'">Gallery</span></a></li>
+            </ul>
+        </div>
+
+        <!-- Extra Links -->
+        <div>
+            <h3 class="text-lg font-semibold mb-4" th:text="'Extra Links'">Extra Links</h3>
+            <ul class="space-y-2 text-gray-300">
+                <li><a href="#" class="hover:text-white"><i class="fa fa-arrow-right mr-2"></i><span th:text="'Account Info'">Account Info</span></a></li>
+                <li><a href="#" class="hover:text-white"><i class="fa fa-arrow-right mr-2"></i><span th:text="'Ordered Items'">Ordered Items</span></a></li>
+                <li><a href="#" class="hover:text-white"><i class="fa fa-arrow-right mr-2"></i><span th:text="'Privacy Policy'">Privacy Policy</span></a></li>
+                <li><a href="#" class="hover:text-white"><i class="fa fa-arrow-right mr-2"></i><span th:text="'Our Services'">Our Services</span></a></li>
+            </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div>
+            <h3 class="text-lg font-semibold mb-4" th:text="'Contact Info'">Contact Info</h3>
+            <ul class="space-y-2 text-gray-300">
+                <li><i class="fa fa-phone mr-2 text-orange-400"></i><span th:text="'0201990090'">0201990090</span></li>
+                <li><i class="fa fa-phone mr-2 text-orange-400"></i><span th:text="'0276693257'">0276693257</span></li>
+                <li><i class="fa fa-envelope mr-2 text-orange-400"></i><span th:text="'EventBrite@gmail.com'">EventBrite@gmail.com</span></li>
+            </ul>
+            <img src="https://raw.githubusercontent.com/KordePriyanka/Books4MU-Book-Store-Website-/main/image/worldmap.png" class="mt-4 w-full h-32 object-contain" alt="Map">
+        </div>
+
+    </div>
+</section>
+
+<!-- Footer Bottom -->
+<footer class="bg-gray-800 text-white py-8 px-6 md:px-20">
+    <div class="text-center max-w-4xl mx-auto">
+        <p class="text-gray-300 mb-6 leading-relaxed" th:text="'Our EventBrite system is dedicated to transforming lives through meaningful live experiences. Follow us on social media to stay updated on our latest charity events and initiatives.'">
+            Our EventBrite system is dedicated to transforming lives through meaningful live experiences.
+            Follow us on social media to stay updated on our latest charity events and initiatives.
+        </p>
+
+        <ul class="flex justify-center gap-6 text-xl text-gray-400 mb-6">
+            <li><a href="https://www.facebook.com/kweku.sam.5621" class="hover:text-white"><i class="fab fa-facebook-f"></i></a></li>
+            <li><a href="https://twitter.com/samuels48052304" class="hover:text-white"><i class="fab fa-twitter"></i></a></li>
+            <li><a href="https://instagram.com/Uhm_ricch" class="hover:text-white"><i class="fab fa-instagram"></i></a></li>
+            <li><a href="https://youtube.com/@samuelsam5556" class="hover:text-white"><i class="fab fa-youtube"></i></a></li>
+        </ul>
+
+        <p class="text-sm text-gray-500">&copy; 2024 Samuel Sam. All rights reserved.</p>
+    </div>
+</footer>
+
+
+<script>
+    // Keep JavaScript as is
+    document.addEventListener('DOMContentLoaded', function() {
+      const ham = document.querySelector('.ham');
+      const navMenu = document.querySelector('.nav-menu');
+
+      ham.addEventListener('click', function(e) {
+        e.stopPropagation();
+        ham.classList.toggle('active');
+        navMenu.classList.toggle('active');
+      });
+
+      document.addEventListener('click', function(e) {
+        if (!navMenu.contains(e.target)) {
+          ham.classList.remove('active');
+          navMenu.classList.remove('active');
+        }
+      });
+
+      window.addEventListener('resize', function() {
+        if (window.innerWidth >= 768) {
+          ham.classList.remove('active');
+          navMenu.classList.remove('active');
+        }
+      });
+    });
+
+    function toggleDropdown(id) {
+      const menu = document.getElementById(id);
+      menu.classList.toggle('hidden');
+      document.querySelectorAll('.absolute').forEach(drop => {
+        if (drop.id !== id) {
+          drop.classList.add('hidden');
+        }
+      });
+    }
+</script>
+</body>
+</html>
