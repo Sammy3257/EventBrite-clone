@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventbrite Home</title>
+
+    <!-- Font Awesome, Tailwind, AlpineJS -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white select-none">
+
+<div x-data="{ sidebarOpen: false }">
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-white shadow-md px-4 py-4">
+        <div class="flex items-center gap-4">
+            <img src="images/ev0.png" alt="Logo" class="w-24">
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- Create Button -->
+            <div x-data="{ open: false, showModal: false }" class="relative">
+                <button @click="open = !open" class="flex items-center gap-2 px-4 py-2 text-white bg-red-500 rounded-full hover:bg-red-600 transition">
+                    <i class="fas fa-plus"></i> Create
+                </button>
+                <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+                    <a href="#" @click.prevent="showModal = true; open = false" class="flex justify-between items-center px-4 py-2 text-sm hover:bg-gray-100">
+                        <i class="fas fa-calendar-alt text-blue-500"></i> <span>Event</span>
+                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- User Dropdown -->
+            <div x-data="{ userDropdownOpen: false }" class="relative">
+                <button @click="userDropdownOpen = !userDropdownOpen" class="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-blue-100 text-gray-800 rounded-full transition">
+                    <i class="fa fa-user"></i>
+                    <i class="fas fa-chevron-down text-sm"></i>
+                </button>
+                <div x-show="userDropdownOpen" @click.away="userDropdownOpen = false" x-transition class="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-lg z-50">
+                    <div class="p-4 border-b text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fa fa-envelope text-blue-500"></i>
+                            <span sec:authentication="name">user@example.com</span>
+                        </div>
+                    </div>
+                    <a th:href="@{/attendance}" class="flex items-center px-4 py-3 text-sm hover:bg-gray-100">
+                        <i class="fa fa-exchange-alt mr-3"></i> Switch to Attendance
+                    </a>
+                    <a th:href="@{/account/settings}" class="flex items-center px-4 py-3 text-sm hover:bg-gray-100">
+                        <i class="fa fa-user mr-3"></i> Account Settings
+                    </a>
+                    <hr />
+                    <a th:href="@{/logout}" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                        <i class="fas fa-sign-out-alt mr-3"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mobile Sidebar Toggle -->
+            <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-2xl text-gray-700">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside :class="sidebarOpen ? 'block' : 'hidden md:block'" class="fixed top-[4.5rem] left-0 z-40 w-64 h-[calc(100vh-4.5rem)] bg-gray-100 border-r">
+        <nav class="p-4 space-y-7">
+            <a th:href="@{/home}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-home text-blue-500 w-5"></i><span class="ml-3">Home</span>
+            </a>
+            <a th:href="@{/Event}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-calendar-alt text-blue-500 w-5"></i><span class="ml-3">Events</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-bullhorn text-blue-500 w-5"></i><span class="ml-3">Marketing</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-chart-line text-blue-500 w-5"></i><span class="ml-3">Reports</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-cog text-blue-500 w-5"></i><span class="ml-3">Settings</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-question-circle text-blue-500 w-5"></i><span class="ml-3">Help</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-ellipsis-h text-blue-500 w-5"></i><span class="ml-3">More</span>
+            </a>
+            <a th:href="@{/logout}" class="flex items-center px-4 py-2 text-black hover:bg-red-100 hover:text-red-500 rounded-md">
+                <i class="fa fa-sign-out text-blue-500 w-5"></i><span class="ml-3">Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+
+
+
+
+    <main class="pt-[4.5rem] md:pl-64 min-h-screen bg-gray-50">
+        <div class="p-6">
+
+        <section class="flex flex-col md:flex-row items-start justify-between gap-10 px-6 md:px-20 py-12">
+
+            <!-- Left Option -->
+            <div class="text-center flex-1 bg-gray-100 p-6 rounded-lg shadow-md">
+                <i class="fa fa-pencil-alt text-2xl bg-white px-3 py-2 rounded-full text-blue-500 mb-2"></i>
+                <h2 class="text-2xl font-bold text-blue-900 mb-2">Start from scratch</h2>
+                <p class="text-black mb-4">
+                    Add all your event details, create new tickets, and set up recurring events.
+                </p>
+                <form th:action="@{/manual}" method="get">
+                    <button type="submit" class="px-4 py-2 text-black rounded-sm border-2 border-gray-200 hover:border-blue-300">
+                        Create event
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Option -->
+            <div class="text-center flex-1 bg-gray-100 p-6 rounded-lg shadow-md">
+                <i class="fa fa-magic text-2xl text-blue-500 bg-white px-3 py-2 rounded-full mb-2"></i>
+                <h2 class="text-2xl font-bold text-blue-900 mb-2">Create my event with AI</h2>
+                <p class="text-black mb-4">
+                    Answer a few quick questions to generate an event that's ready to publish almost instantly.
+                </p>
+                <form  th:action="@{/AI}" method="get">
+                    <button type="submit" class="px-4 py-2 text-black rounded-sm border-2 border-gray-200 hover:border-blue-300">
+                        Create with AI
+                    </button>
+                </form>
+            </div>
+
+        </section>
+<br>
+
+
+        <section class="bg-white py-12 px-6 md:px-20 border-2 rounded-lg">
+            <!-- Title -->
+            <h2 class="text-3xl font-bold text-blue-900 mb-4">Your checklist</h2>
+            <p class="text-black mb-10 max-w-2xl">
+                We make it easy to plan successful events. Here's how to start!
+            </p>
+
+            <!-- Checklist items -->
+            <div class="space-y-8">
+
+                <!-- Item 1 -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border border-gray-200 rounded-lg shadow-sm hover:border-blue-500">
+                    <div>
+                        <h3 class="text-xl font-semibold text-blue-900">Create event</h3>
+                        <p class="text-black">Publish an event to reach millions of people on Eventbrite.</p>
+                    </div>
+                    <form th:action="@{/events/create}" method="get">
+                        <button type="submit" class="mt-4 md:mt-0 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
+                            Start here
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border border-gray-200 rounded-lg shadow-sm hover:border-blue-500">
+                    <div>
+                        <h3 class="text-xl font-semibold text-blue-900">Set up your organizer profile</h3>
+                        <p class="text-black">Highlight your brand by adding your organizer name, image, and bio.</p>
+                    </div>
+                    <form th:action="@{/organizer/setup}" method="get">
+                        <button type="submit" class="mt-4 md:mt-0 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
+                            Set up profile
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border border-gray-200 rounded-lg shadow-sm hover:border-blue-500">
+                    <div>
+                        <h3 class="text-xl font-semibold text-blue-900">Add your bank account</h3>
+                        <p class="text-black">Get paid for future ticket sales by entering your bank details.</p>
+                    </div>
+                    <form th:action="@{/account/bank-details}" method="get">
+                        <button type="submit" class="mt-4 md:mt-0 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
+                            Add account
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+<br>
+
+        <section style="border: #e5e1e1 2px solid;  border-radius: 10px;" class="border-gray-200 py-12 px-6 md:px-20">
+            <!-- Section Header -->
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Top resources for you</h2>
+
+            <a th:href="@{/blog}" class="text-blue-600 font-bold text-1xl hover:underline">
+                <h3 class="mb-4">Visit Eventbrite Blog</h3>
+            </a>
+
+            <!-- Resource Cards Container -->
+            <div class="grid gap-8 md:grid-cols-3">
+
+                <!-- Card 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
+                    <div>
+                        <p class="flex items-center text-sm text-gray-800 font-semibold">
+                            <img class="w-8 h-8 mr-2" th:src="@{/images/ev00.png}">
+                            Eventbrite
+                        </p>
+                        <p class="text-sm text-gray-500 mb-2">Marketing Experts</p>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Digital Marketing Guide for Events</h3>
+                    </div>
+                    <a th:href="@{/articles/digital-marketing-guide}" class="inline-block mt-auto text-blue-600 hover:underline font-medium">
+                        <i class="fa fa-file mx-2"></i>Read article
+                    </a>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
+                    <div>
+                        <p class="flex items-center text-sm text-gray-800 font-semibold">
+                            <img class="w-8 h-8 mr-2" th:src="@{/images/ev00.png}">
+                            Eventbrite
+                        </p>
+                        <p class="text-sm text-gray-500 mb-2">Marketing Experts</p>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Safety Playbook for Events</h3>
+                    </div>
+                    <a th:href="@{/articles/safety-playbook}" class="inline-block mt-auto text-blue-600 hover:underline font-medium">
+                        <i class="fa fa-file mx-2"></i>Read article
+                    </a>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
+                    <div>
+                        <p class="flex items-center text-sm text-gray-800 font-semibold">
+                            <img class="w-8 h-8 mr-2" th:src="@{/images/ev00.png}">
+                            Eventbrite
+                        </p>
+                        <p class="text-sm text-gray-500 mb-2">Marketing Experts</p>
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">10 Best Ways to Market and Sell Out Your Event</h3>
+                    </div>
+                    <a th:href="@{/articles/best-ways-to-market}" class="inline-block mt-auto text-blue-600 hover:underline font-medium">
+                        <i class="fa fa-file mx-2"></i>Read article
+                    </a>
+                </div>
+
+            </div>
+        </section>
+<br>
+        <style>
+            @keyframes scroll-x {
+              0% {
+                transform: translateX(5%);
+              }
+              100% {
+                transform: translateX(-250%);
+              }
+            }
+
+            .scroll-container {
+              display: flex;
+              flex-wrap: nowrap;
+              animation: scroll-x 30s linear infinite;
+            }
+
+            .course-card {
+              width: 300px;
+              flex-shrink: 0;
+            }
+
+            .scrolling-box {
+              border: 1px solid #e5e7eb;
+              border-radius: 12px;
+              padding: 30px;
+              background: white;
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+              margin: 0 auto;
+              max-width: 950px;
+            }
+
+            .scroll-wrapper {
+              position: relative;
+              overflow: hidden;
+              border-radius: 8px;
+            }
+
+            body, html {
+              overflow-x: hidden;
+            }
+        </style>
+
+        <section class="px-8 md:px-20 py-12 bg-gray-50">
+            <div class="scrolling-box">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+                        Level up your skills at Eventbrite Academy
+                    </h2>
+                    <a th:href="@{/academy}" class="text-blue-600 font-medium hover:underline">Visit Eventbrite Academy</a>
+                </div>
+
+                <!-- Auto-scroll Wrapper -->
+                <div class="scroll-wrapper">
+                    <div class="scroll-container gap-6">
+                        <div class="flex gap-6">
+                            <!-- Repeat cards manually -->
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/0.jpeg}" alt="Create Tickets">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 23 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">Create Tickets</h3>
+                                <p class="text-sm text-gray-600 mt-1">This guide will show you how to create and edit ticket types for your event.</p>
+                                <a th:href="@{/courses/1}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/1.jpeg}" alt="Getting Paid">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 7 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">Getting Paid via Eventbrite</h3>
+                                <p class="text-sm text-gray-600 mt-1">This guide will walk you through how to add a payout method to your event.</p>
+                                <a th:href="@{/courses/2}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/2.jpeg}" alt="Order Confirmation">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 14 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">Order Confirmation</h3>
+                                <p class="text-sm text-gray-600 mt-1">Communicate essential details about parking, check-in, and items to bring.</p>
+                                <a th:href="@{/courses/3}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/3.jpeg}" alt="Refund Policy">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 12 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">Refund Policy</h3>
+                                <p class="text-sm text-gray-600 mt-1">Learn how to set a refund policy for your Eventbrite events.</p>
+                                <a th:href="@{/courses/4}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/4.jpeg}" alt="Emails to Attendees">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 5 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">Emails to Attendees</h3>
+                                <p class="text-sm text-gray-600 mt-1">Learn how to communicate effectively with attendees via email.</p>
+                                <a th:href="@{/courses/5}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/5.jpeg}" alt="Check In">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 8 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">Scanning and Check In</h3>
+                                <p class="text-sm text-gray-600 mt-1">Use the Eventbrite Organizer App to manage check-ins.</p>
+                                <a th:href="@{/courses/6}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/6.jpeg}" alt="Email Marketing">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 20 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">Email Marketing Best Practices</h3>
+                                <p class="text-sm text-gray-600 mt-1">Drive ticket sales through effective email campaigns.</p>
+                                <a th:href="@{/courses/7}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/7.jpeg}" alt="Social Media Marketing">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 10 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">Intro to Organic Social Media Marketing</h3>
+                                <p class="text-sm text-gray-600 mt-1">Learn social media basics for event promotion.</p>
+                                <a th:href="@{/courses/8}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/8.jpeg}" alt="Ad Campaign">
+                                <span class="text-xs text-gray-500 font-medium">COURSE • 15 min</span>
+                                <h3 class="text-lg font-semibold text-gray-800 mt-2">FB & IG Ad Campaign with Eventbrite Boost</h3>
+                                <p class="text-sm text-gray-600 mt-1">Create effective social media ads through Eventbrite.</p>
+                                <a th:href="@{/courses/9}" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">View course</a>
+                            </div>
+                        </div>
+
+                        <!-- Duplicated cards for seamless loop -->
+                        <div class="flex gap-6" aria-hidden="true">
+                            <div class="course-card p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+                                <img class="w-full rounded-lg" th:src="@{/images/0.jpeg}" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+<br>
+        <section class="bg-white border-2 border-gray-200 rounded-lg py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Community Spotlight</h2>
+
+                <div class="grid gap-12 lg:grid-cols-3">
+                    <!-- Prashant Card -->
+                    <div class="bg-white shadow-md rounded-2xl overflow-hidden">
+                        <img th:src="@{images/ev6.jpg}" alt="Prashant speaking at Holi-Hai Festival" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Meet Prashant</h3>
+                            <p class="text-gray-700 mb-4">
+                                "As someone who completely relies on people buying tickets to [our] event to get the word out, Eventbrite plays a huge part in my business."
+                            </p>
+                            <p class="text-sm text-gray-600 mb-4">
+                                — Prashant Kakad, Founder of Jai Ho! Dance Party and Bollywood Dreams Entertainment
+                            </p>
+                            <a th:href="@{#}" class="text-indigo-600 font-medium hover:underline">Read article</a>
+                        </div>
+                    </div>
+
+                    <!-- Amanda Card -->
+                    <div class="bg-white shadow-md rounded-2xl overflow-hidden">
+                        <img th:src="@{images/ev7.jpg}" alt="Guests with JFS picnic blankets" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Meet Amanda</h3>
+                            <p class="text-gray-700 mb-4">
+                                “What I really like about using Eventbrite for our events is a myriad of things. One, it's recognizable…”
+                            </p>
+                            <p class="text-sm text-gray-600 mb-4">
+                                — Amanda Dell, Program Director, Jewish Food Society
+                            </p>
+                            <a th:href="@{#}" class="text-indigo-600 font-medium hover:underline">Read article</a>
+                        </div>
+                    </div>
+
+                    <!-- Paul Card -->
+                    <div class="bg-white shadow-md rounded-2xl overflow-hidden">
+                        <img th:src="@{images/ev8.jpg}" alt="Bass player at The Outpost" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">Meet Paul</h3>
+                            <p class="text-gray-700 mb-4">
+                                "Bringing marketing and sales to the table is really what sets Eventbrite apart."
+                            </p>
+                            <p class="text-sm text-gray-600 mb-4">
+                                — Paul Thornton, Founder of TAG Presents
+                            </p>
+                            <a th:href="@{#}" class="text-indigo-600 font-medium hover:underline">Read article</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+<br>
+
+        <section class="py-16  border-2 border-gray-200 rounded-lg">
+            <div class="text-center max-w-4xl mx-auto px-4">
+                <h3 class="text-3xl font-bold text-gray-900 mb-6">How can we help?</h3>
+
+                <a th:href="@{#}" class="text-blue-600 text-lg mb-10 inline-block hover:underline">
+                    Go to Help Center
+                </a>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mt-10">
+                    <!-- Creating an event -->
+                    <div class="flex flex-col border-2 p-4 py-6 border-gray-200 hover:bg-blue-50 hover:border-blue-500 rounded-lg items-center">
+                        <i class="fa fa-calendar text-3xl text-indigo-600 mb-3 py-2 px-4 rounded-full bg-gray-100 hover:bg-blue-100"></i>
+                        <p>Creating an event</p>
+                    </div>
+
+                    <!-- Your account -->
+                    <div class="flex flex-col items-center border-2 p-4 py-6 border-gray-200 hover:bg-blue-50 hover:border-blue-500 rounded-lg">
+                        <i class="fa fa-user text-3xl text-indigo-600 mb-3 py-2 px-4 rounded-full bg-gray-100 hover:bg-blue-100"></i>
+                        <p>Your account</p>
+                    </div>
+
+                    <!-- Marketing an event -->
+                    <div class="flex flex-col items-center border-2 p-4 py-6 border-gray-200 hover:bg-blue-50 hover:border-blue-500 rounded-lg">
+                        <i class="fa fa-bullhorn text-3xl text-indigo-600 mb-3 py-2 px-4 rounded-full bg-gray-100 hover:bg-blue-100"></i>
+                        <p>Marketing an event</p>
+                    </div>
+
+                    <!-- Payouts and taxes -->
+                    <div class="flex flex-col items-center border-2 p-4 py-6 border-gray-200 hover:bg-blue-50 hover:border-blue-500 rounded-lg">
+                        <i class="fa fa-calculator text-3xl text-indigo-600 mb-3 py-2 px-4 rounded-full bg-gray-100 hover:bg-blue-100"></i>
+                        <p>Payouts and taxes</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+    </div>
+    </main>
+</div>
+
+
+</div>
+<script>
+    document.getElementById('createWithAI').addEventListener('click', async () => {
+    try {
+        const res = await fetch('/api/events/ai-generate');
+        const data = await res.json();
+
+        // Fill your form fields
+        document.querySelector('[name="eventTitle"]').value = data.title;
+        document.querySelector('[name="eventDate"]').value = data.date;
+        document.querySelector('[name="startTime"]').value = data.startTime;
+        document.querySelector('[name="endTime"]').value = data.endTime;
+        quill.root.innerHTML = data.description; // For Quill editor
+    } catch (err) {
+        alert("AI generation failed.");
+        console.error(err);
+    }
+});
+
+</script>
+</body>
+</html>

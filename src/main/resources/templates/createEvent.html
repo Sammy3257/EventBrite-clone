@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventbrite manual create</title>
+
+    <!-- Font Awesome, Tailwind, AlpineJS -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white select-none">
+
+<div x-data="{ sidebarOpen: false }">
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-white shadow-md px-4 py-4">
+        <div class="flex items-center gap-4">
+            <img src="images/ev0.png" alt="Logo" class="w-24">
+        </div>
+
+        <div class="flex items-center gap-4">
+            <!-- Create Button -->
+            <div x-data="{ open: false, showModal: false }" class="relative">
+                <button @click="open = !open" class="flex items-center gap-2 px-4 py-2 text-white bg-red-500 rounded-full hover:bg-red-600 transition">
+                    <i class="fas fa-plus"></i> Create
+                </button>
+                <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
+                    <a href="#" @click.prevent="showModal = true; open = false" class="flex justify-between items-center px-4 py-2 text-sm hover:bg-gray-100">
+                        <i class="fas fa-calendar-alt text-blue-500"></i> <span>Event</span>
+                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- User Dropdown -->
+            <div x-data="{ userDropdownOpen: false }" class="relative">
+                <button @click="userDropdownOpen = !userDropdownOpen" class="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-blue-100 text-gray-800 rounded-full transition">
+                    <i class="fa fa-user"></i>
+                    <i class="fas fa-chevron-down text-sm"></i>
+                </button>
+                <div x-show="userDropdownOpen" @click.away="userDropdownOpen = false" x-transition class="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-lg z-50">
+                    <div class="p-4 border-b text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fa fa-envelope text-blue-500"></i>
+                            <span sec:authentication="name">user@example.com</span>
+                        </div>
+                    </div>
+                    <a th:href="@{/attendance}" class="flex items-center px-4 py-3 text-sm hover:bg-gray-100">
+                        <i class="fa fa-exchange-alt mr-3"></i> Switch to Attendance
+                    </a>
+                    <a th:href="@{/account/settings}" class="flex items-center px-4 py-3 text-sm hover:bg-gray-100">
+                        <i class="fa fa-user mr-3"></i> Account Settings
+                    </a>
+                    <hr />
+                    <a th:href="@{/logout}" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                        <i class="fas fa-sign-out-alt mr-3"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <!-- Mobile Sidebar Toggle -->
+            <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-2xl text-gray-700">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside :class="sidebarOpen ? 'block' : 'hidden md:block'" class="fixed top-[4.5rem] left-0 z-40 w-64 h-[calc(100vh-4.5rem)] bg-gray-100 border-r">
+        <nav class="p-4 space-y-7">
+            <a th:href="@{/home}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-home text-blue-500 w-5"></i><span class="ml-3">Home</span>
+            </a>
+            <a th:href="@{/Event}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-calendar-alt text-blue-500 w-5"></i><span class="ml-3">Events</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-bullhorn text-blue-500 w-5"></i><span class="ml-3">Marketing</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-chart-line text-blue-500 w-5"></i><span class="ml-3">Reports</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-cog text-blue-500 w-5"></i><span class="ml-3">Settings</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-question-circle text-blue-500 w-5"></i><span class="ml-3">Help</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-ellipsis-h text-blue-500 w-5"></i><span class="ml-3">More</span>
+            </a>
+            <a th:href="@{/logout}" class="flex items-center px-4 py-2 text-black hover:bg-red-100 hover:text-red-500 rounded-md">
+                <i class="fa fa-sign-out text-blue-500 w-5"></i><span class="ml-3">Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+
+
+
+
+    <main class="pt-[4.5rem] md:pl-64 min-h-screen bg-gray-50">
+        <div class="p-6">
+
+
+        <form th:action="@{/manual}" th:object="${event}" method="POST" enctype="multipart/form-data">
+
+        <section id="sliderSection"
+                 class="relative border-2 border-gray-300 hover:border-blue-500 cursor-pointer rounded-md max-w-4xl mx-auto bg-slider transition-all duration-1000 h-96 overflow-hidden">
+            <i class="fa fa-plus absolute top-4 right-4 text-blue-600 text-1xl bg-gray-200 px-2 py-2 rounded-full shadow-lg z-20"></i>
+
+            <!-- Background overlay -->
+            <div id="overlay"
+                 class="absolute inset-0 bg-white bg-opacity-40 z-0 pointer-events-none transition-opacity duration-300"></div>
+
+            <!-- Centered Box -->
+            <div id="centerBox"
+
+                 class="absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white bg-opacity-90 text-center rounded-lg px-3 py-3 shadow-lg text-blue-600 font-semibold text-lg">
+                <i class="fa fa-download"></i>
+                Upload Photo and Video
+            </div>
+
+            <!-- Upload Section -->
+            <div id="uploadSection"
+                 class="hidden relative z-10 px-6 pt-28 pb-10 space-y-10">
+
+                <h1 class="text-2xl font-bold text-gray-700 text-center">Add Image and Video</h1>
+
+                <!-- Image Upload -->
+                <div>
+                    <p class="font-semibold">Image</p>
+                    <p class="text-sm text-gray-600">Use photos that set the mood. Avoid distracting text overlays.</p>
+                    <div class="mt-4 border-4 border-dashed border-blue-300 rounded-lg flex items-center justify-center flex-col h-64 bg-white">
+                        <label for="imageUpload" class="text-blue-600 font-semibold cursor-pointer text-center">
+                            <i class="fas fa-image text-4xl mb-2"></i><br/>
+                            Choose an Image
+                        </label>
+                        <input type="file" name="imageFile" accept="image/*" id="imageUpload" class="hidden">
+                    </div>
+                    <p class="text-sm mt-2 text-gray-600">Size: 2160x1080px · Max: 10MB · Formats: JPEG, PNG</p>
+                </div>
+
+                <!-- Video Upload -->
+                <div>
+                    <p class="font-semibold">Video</p>
+                    <p class="text-sm text-gray-600">Add a short video that reflects the event vibe.</p>
+                    <div class="mt-4 border-4 border-dashed border-blue-300 rounded-lg flex items-center justify-center flex-col h-64 bg-white">
+                        <label for="videoUpload" class="text-blue-600 font-semibold cursor-pointer text-center">
+                            <i class="fas fa-video text-4xl mb-2"></i><br/>
+                            Choose a Video
+                        </label>
+                        <div th:if="${event.videoPath}">
+                            <video controls class="w-full">
+                                <source th:src="@{${uploadsPath + event.videoPath}}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        <input type="file" name="videoFile" accept="video/*" id="videoUpload" class="hidden">
+                    </div>
+                    <p class="text-sm mt-2 text-gray-600">Min: 480p · Up to 1 min · MP4, MOV</p>
+                </div>
+
+            </div>
+        </section>
+
+<br><br>
+
+        <section id="eventSection"
+                 class="relative border-2 border-gray-300 hover:border-blue-500 cursor-pointer rounded-md max-w-4xl mx-auto bg-white transition-all duration-500 overflow-hidden h-auto px-6 py-8">
+
+            <!-- Plus Icon -->
+            <i class="fa fa-plus absolute top-4 right-4 text-blue-600 text-1xl bg-gray-200 px-2 py-2 rounded-full shadow-lg z-20"></i>
+
+            <!-- Click Trigger -->
+            <div id="introText" class="cursor-pointer">
+                <h1 class="text-5xl mb-3 font-bold">Event Title</h1>
+                <p class="font-medium text-gray-700">A short and sweet sentence about your event.</p>
+            </div>
+
+            <!-- Toggle Form -->
+            <div id="eventForm" class="hidden max-w-2xl mx-auto mt-8 p-8 bg-white rounded-2xl shadow-lg border border-gray-200">
+
+                <!-- Header -->
+                <h2 class="text-3xl font-bold text-gray-900 mb-6 border-b border-gray-200 pb-4">Event Overview</h2>
+
+                <!-- Form Content -->
+                <div class="space-y-10">
+
+                    <!-- Event Title -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Event Title <span class="text-red-500">*</span>
+                        </label>
+                        <p class="font-medium text-gray-500 mb-3">
+                            Be clear and descriptive with a title that tells people what your event is about.
+                        </p>
+                        <input type="text"
+                               required
+                               th:field="*{title}"
+                               name="title"
+                               placeholder="Enter event title"
+                               class="w-full px-4 py-3 border border-red-400 placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500" />
+                        <p class="text-red-500 text-sm mt-1">Event title is required.</p>
+                    </div>
+                    <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+                    <!-- Summary -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Summary <span class="text-red-500">*</span>
+                        </label>
+                        <p class="font-medium text-gray-500 mb-3">
+                            Grab attention with a short description displayed at the top of your event page (140 characters max).
+                        </p>
+                        <textarea maxlength="140"
+                                  type="text"
+                                  required
+                                  name="summary"
+                                  th:field="*{summary}"
+                                  placeholder="Enter summary"
+                                  class="w-full px-4 py-3 border border-red-400 placeholder-gray-400 rounded-md h-28 resize-none focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-500"><span id="charCount">0</span>/140</span>
+                        </div>
+                        <p class="text-red-500 text-sm mt-1">Summary is required.</p>
+                    </div>
+                    <button type="button" class="text-sm text-blue-600 hover:underline">Suggest Summary</button>
+
+                </div>
+            </div>
+
+
+
+        </section>
+
+<br><br>
+
+        <section id="DateSection"
+                 class="relative border-2 border-gray-200 hover:border-blue-500 cursor-pointer rounded-md max-w-4xl mx-auto bg-white transition-all duration-500 overflow-hidden h-auto px-8 py-10 shadow-md">
+
+            <!-- Plus Icon -->
+            <i class="fa fa-plus absolute top-4 right-4 text-blue-600 text-lg bg-gray-100 px-3 py-2 rounded-full shadow z-20"></i>
+
+            <!-- Trigger Summary -->
+            <div id="dateIntro" class="cursor-pointer">
+                <div class="flex flex-col md:flex-row justify-between items-start gap-12 mb-10">
+                    <!-- Date & Time -->
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Date & Time</h2>
+                        <p class="text-gray-700 font-medium">
+                            <i class="fa fa-calendar mr-2"></i>
+                            Wednesday, June 5 · 10:00 AM – 5:00 PM GMT
+                        </p>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-gray-700 mb-4">Location</h2>
+                        <p class="text-gray-700 font-medium">
+                            <i class="fa fa-map-marker mr-2"></i>
+                            Enter a location
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Map Image -->
+                <div class="rounded-lg overflow-hidden border border-gray-300">
+                    <img src="images/map.png" alt="Event Location Map" class="w-full h-auto object-cover" />
+                </div>
+            </div>
+
+            <!-- Toggle Form -->
+            <div id="dateForm" class="hidden mt-10 space-y-10 bg-gray-50 p-8 rounded-lg shadow-inner border border-gray-200">
+
+                <!-- Header -->
+                <h2 class="text-3xl font-bold text-gray-800">Date and Location</h2>
+
+                <!-- Event Type -->
+
+                <div class="max-w-xl space-y-4">
+                    <label class="block text-lg font-semibold text-gray-800 mb-2">Type of Event</label>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <!-- Single Event -->
+                        <label class="group relative flex items-center justify-between gap-4 px-5 py-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition duration-200 w-full sm:w-1/2">
+                            <div class="flex items-center gap-3">
+                                <!-- Calendar Icon -->
+                                <i class="fa fa-calendar text-gray-400 group-has-[input:checked]:text-blue-600 transition duration-200 text-lg"></i>
+                                <span class="text-gray-800 font-medium">Single event</span>
+                            </div>
+                            <!-- Radio Button -->
+                            <input type="radio" th:field="*{eventType}" value="SINGLE" name="eventType" class="form-radio text-blue-600 w-5 h-5" checked />
+                        </label>
+
+                        <!-- Recurring Event -->
+                        <label class="group relative flex items-center justify-between gap-4 px-5 py-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition duration-200 w-full sm:w-1/2">
+                            <div class="flex items-center gap-3">
+                                <!-- Calendar Icon -->
+                                <i class="fa fa-calendar text-gray-400 group-has-[input:checked]:text-blue-600 transition duration-200 text-lg"></i>
+                                <span class="text-gray-800 font-medium flex items-center gap-2">
+          Recurring event
+          <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">New</span>
+        </span>
+                            </div>
+                            <!-- Radio Button -->
+                            <input type="radio" th:field="*{eventType}" th:value="RECURRING" name="eventType" class="form-radio text-blue-600 w-5 h-5" />
+                        </label>
+                    </div>
+                </div>
+
+
+                <!-- Date & Time Inputs -->
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-3">Date & Time</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                        <!-- Date -->
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Date</label>
+                            <input
+                                    type="date"
+                                    name="eventDate"
+                                    th:field="*{eventDate}"
+                                    value="2025-06-20"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                        </div>
+
+                        <!-- Start Time -->
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">Start Time</label>
+                            <input
+                                    type="time"
+                                    name="startTime"
+                                    th:field="*{startTime}"
+                                    value="10:00"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                        </div>
+
+                        <!-- End Time -->
+                        <div>
+                            <label class="block text-sm text-gray-600 mb-1">End Time</label>
+                            <input
+                                    type="time"
+                                    name="endTime"
+                                    th:field="*{endTime}"
+                                    value="12:00"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    <button class="mt-4 text-blue-600 underline text-sm hover:text-blue-800 transition">More options</button>
+                </div>
+
+
+                <!-- Location Section -->
+                <div id="locationOptions">
+                    <label class="block text-lg font-semibold text-gray-700 mb-4">Location</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <!-- Venue (Radio) -->
+                        <label data-option class="location-option flex items-center justify-between border hover:border-blue-600 rounded-lg p-4 cursor-pointer transition-all group border-gray-300">
+                            <div class="flex items-center gap-3">
+                                <i class="fa fa-map-marker-alt   text-gray-400 group-has-[input:checked]:text-blue-600 transition duration-200 text-md"></i>
+                                <span class="text-gray-700 font-medium">Venue</span>
+                            </div>
+                            <input type="radio" name="locationType" th:field="*{locationType}" value="VENUE" class="form-radio text-blue-600 ml-2" />
+                        </label>
+
+                        <!-- Online Event (Radio) -->
+                        <label data-option class="location-option flex items-center justify-between border hover:border-blue-600 rounded-lg p-4 cursor-pointer transition-all group border-gray-300">
+                            <div class="flex items-center gap-3">
+                                <i class="fa fa-globe text-gray-400 group-has-[input:checked]:text-blue-600 transition duration-200 text-md"></i>
+                                <span class="text-gray-700 font-medium">Online event</span>
+                            </div>
+                            <input type="radio" name="locationType" th:field="*{locationType}" value="ONLINE" class="form-radio text-blue-600 ml-2" />
+                        </label>
+
+                        <!-- To Be Announced (Radio) -->
+                        <label data-option class="location-option flex items-center justify-between border hover:border-blue-600 rounded-lg p-4 cursor-pointer transition-all group border-gray-300">
+                            <div class="flex items-center gap-3">
+                                <i class="fa fa-clock text-gray-400 group-has-[input:checked]:text-blue-600 transition duration-200 text-md"></i>
+                                <span class="text-gray-700 font-medium">To be announced</span>
+                            </div>
+                            <input type="radio" th:field="*{locationType}" name="locationType" value="TBA" class="form-radio text-blue-600 ml-2" />
+                        </label>
+
+                    </div>
+
+                    <!-- Location Input (Visible only if 'Venue' is selected) -->
+                    <div id="venueLocationInput" class="hidden">
+                        <label class="block text-sm text-gray-600 mt-5 mb-1">Location <span class="text-red-500">*</span></label>
+                        <input type="text"
+                               name="location"
+                               th:field="*{locationDetails}"
+                               placeholder="Enter venue name, address or link"
+                               class="w-full px-4 py-2 border border-red-400 rounded-lg focus:ring-2 focus:ring-red-400 focus:outline-none placeholder-gray-400" />
+                        <p class="text-red-500 text-xs mb-4">Location is required</p>
+                        <img src="images/map.png" alt="Event Location Map" class="w-full h-auto object-cover" />
+                    </div>
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+
+
+<br><br>
+
+
+            <!-- Quill CSS -->
+            <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+            <section id="overviewSection"
+                     class="relative border-2 border-gray-300 hover:border-blue-500 cursor-pointer rounded-md max-w-4xl mx-auto bg-white transition-all duration-500 overflow-hidden h-auto px-6 py-8">
+                <i class="fa fa-plus absolute top-4 right-4 text-blue-600 text-lg bg-gray-100 px-3 py-2 rounded-full shadow z-20"></i>
+
+                <h2 class="text-2xl font-bold mb-4">Overview</h2>
+                <p class="font-medium text-gray-500">
+                    Use this section to provide more details about your event. You can include venue info, accessibility options, etc.
+                </p>
+
+                <!-- Expanded Area -->
+                <div id="extraContent" class="mt-6 hidden space-y-4">
+                    <p class="text-gray-600">Add more details about your event and include what people can expect if they attend.</p>
+
+                    <!-- Quill Toolbar -->
+                    <div id="editorToolbar" class="border border-gray-300 rounded-t-lg bg-white"></div>
+
+                    <!-- Quill Editor Container -->
+                    <div id="editorContent" class="border border-t-0 border-gray-300 rounded-b-lg bg-white h-48 overflow-auto"></div>
+
+                    <div class="flex flex-wrap gap-4">
+                        <button class="px-4 py-2 border-2 border-gray-300 hover:border-blue-500 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
+                            <i class="fa fa-file mr-2"></i>Add text
+                        </button>
+                        <button class="px-4 py-2 border-2 border-gray-300 hover:border-blue-500 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
+                            <i class="fa fa-image mr-2"></i>Add image
+                        </button>
+                        <button class="px-4 py-2 border-2 border-gray-300 hover:border-blue-500 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
+                            <i class="fa fa-video mr-2"></i>Add video
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+<br><br>
+
+        <section id="agendaSection" class="relative border-2 border-gray-300 hover:border-blue-500 rounded-md max-w-4xl mx-auto bg-white transition-all duration-300 px-6 py-8 shadow-sm mb-6">
+
+            <!-- Agenda Preview -->
+            <div id="agendaPreview" class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-1">Add more sections to your event page</h3>
+                    <p class="text-gray-600 text-sm mb-2">
+                        Make your event stand out even more. These sections help attendees find information and answer their questions.
+                    </p>
+                    <button class="text-blue-600 text-sm hover:underline">See examples</button>
+                </div>
+                <button id="agendaAddBtn" class="border-2 hover:border-blue-500 text-gray-700 font-medium text-sm px-5 py-2 rounded-md shadow">
+                    Add
+                </button>
+            </div>
+
+            <!-- Hidden Form Block -->
+            <div id="agendaForm" class="hidden mt-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-xl font-semibold text-gray-800">Agenda</h4>
+                    <button id="deleteAgenda" class="text-red-600 text-sm font-semibold hover:underline">Delete section</button>
+                </div>
+                <p class="text-gray-600">
+                    Add an itinerary, schedule, or lineup to your event. You can include a time, a description, and who will host or perform.
+                </p>
+
+                <!-- Agenda Slot -->
+                <div class="border rounded-lg p-4 space-y-4 bg-gray-50">
+                    <button class="text-blue-600 font-medium text-sm mb-2 hover:underline">+ Add new agenda</button>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-500">*</span></label>
+                        <input type="text" placeholder="Enter title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Start time</label>
+                            <input type="time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">End time</label>
+                            <input type="time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Host or Artist</label>
+                        <input type="text" placeholder="Speaker, performer, guide..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Add description</label>
+                        <textarea rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Optional description..."></textarea>
+                    </div>
+
+                    <button class="text-blue-600 font-medium text-sm hover:underline">+ Add slot</button>
+                </div>
+            </div>
+        </section>
+
+
+
+
+
+
+
+
+
+
+        <!-- Fixed Bottom Bar -->
+        <div id="bottomBar" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-end">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-md transition duration-200">
+                    Save and continue
+                </button>
+            </div>
+        </div>
+
+        </form>
+
+
+
+
+
+
+    </div>
+    </main>
+
+</div>
+
+
+<!-- Upload Slider Script -->
+<script>
+    (function() {
+      const sliderSection = document.getElementById('sliderSection');
+      const uploadSection = document.getElementById('uploadSection');
+      const centerBox = document.getElementById('centerBox');
+      const overlay = document.getElementById('overlay');
+
+      const images = ["images/Back1.jpg", "images/back2.jpg", "images/Back3.jpg"];
+      let index = 0;
+      let expandedSlider = false;
+
+      // Start slider
+      let interval = setInterval(() => {
+        if (!expandedSlider) {
+          index = (index + 1) % images.length;
+          sliderSection.style.backgroundImage = `url('${images[index]}')`;
+        }
+      }, 3000);
+      sliderSection.style.backgroundImage = `url('${images[index]}')`;
+
+      // Show upload UI
+      sliderSection.addEventListener('click', (e) => {
+        if (!expandedSlider) {
+          expandedSlider = true;
+          clearInterval(interval);
+          sliderSection.classList.remove('h-96');
+          sliderSection.classList.add('h-auto');
+          sliderSection.style.backgroundImage = 'none';
+          centerBox.classList.add('hidden');
+          overlay.classList.add('hidden');
+          uploadSection.classList.remove('hidden');
+          e.stopPropagation();
+        }
+      });
+
+      // Click outside to reset
+      document.addEventListener('click', (e) => {
+        if (expandedSlider && !sliderSection.contains(e.target)) {
+          expandedSlider = false;
+          uploadSection.classList.add('hidden');
+          centerBox.classList.remove('hidden');
+          overlay.classList.remove('hidden');
+          sliderSection.classList.remove('h-auto');
+          sliderSection.classList.add('h-96');
+          sliderSection.style.backgroundImage = `url('${images[index]}')`;
+
+          interval = setInterval(() => {
+            index = (index + 1) % images.length;
+            sliderSection.style.backgroundImage = `url('${images[index]}')`;
+          }, 4000);
+        }
+      });
+    })();
+</script>
+
+<!-- Event Form Toggle Script -->
+<script>
+    (function() {
+      const section = document.getElementById('eventSection');
+      const form = document.getElementById('eventForm');
+      const intro = document.getElementById('introText');
+
+      let expandedForm = false;
+
+      intro.addEventListener('click', (e) => {
+        e.stopPropagation();
+        form.classList.remove('hidden');
+        intro.classList.add('hidden');
+        expandedForm = true;
+      });
+
+      form.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener('click', (e) => {
+        if (expandedForm && !section.contains(e.target)) {
+          form.classList.add('hidden');
+          intro.classList.remove('hidden');
+          expandedForm = false;
+        }
+      });
+    })();
+</script>
+
+<script>
+    const section = document.getElementById('DateSection');
+    const intro = document.getElementById('dateIntro');
+    const form = document.getElementById('dateForm');
+    let open = false;
+
+    intro.addEventListener('click', (e) => {
+        e.stopPropagation();
+        form.classList.remove('hidden');
+        intro.classList.add('hidden');
+        open = true;
+    });
+
+    form.addEventListener('click', (e) => e.stopPropagation());
+
+    document.addEventListener('click', (e) => {
+        if (open && !section.contains(e.target)) {
+            form.classList.add('hidden');
+            intro.classList.remove('hidden');
+            open = false;
+        }
+    });
+</script>
+
+<script>
+    // Handle the display of the location input form based on radio button selection
+    const locationOptions = document.querySelectorAll('[data-option] input[type="radio"]');
+    const venueLocationInput = document.getElementById('venueLocationInput');
+
+    locationOptions.forEach(option => {
+        option.addEventListener('change', () => {
+            if (option.value === 'VENUE') {
+                venueLocationInput.classList.remove('hidden');
+            } else {
+                venueLocationInput.classList.add('hidden');
+            }
+        });
+    });
+</script>
+
+
+
+<!-- Quill Script -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<script>
+    // Wait for DOM to fully load
+    document.addEventListener('DOMContentLoaded', function () {
+        // Toggle logic
+        const overviewSection = document.getElementById('overviewSection');
+        const extraContent = document.getElementById('extraContent');
+
+        overviewSection.addEventListener('click', function (e) {
+            if (e.target.closest('.ql-toolbar') || e.target.closest('.ql-editor')) return;
+            extraContent.classList.remove('hidden');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!overviewSection.contains(e.target)) {
+                extraContent.classList.add('hidden');
+            }
+        });
+
+        // Quill toolbar config
+        const toolbarOptions = [
+            [{ 'header': [1, 2, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['link', 'image'],
+            ['clean']
+        ];
+
+        // Initialize Quill
+        const quill = new Quill('#editorContent', {
+            modules: {
+                toolbar: {
+                    container: '#editorToolbar',
+                    handlers: {}
+                }
+            },
+            theme: 'snow',
+            placeholder: 'Add your event details here...'
+        });
+    });
+</script>
+
+
+<script>
+    const agendaAddBtn = document.getElementById('agendaAddBtn');
+    const agendaForm = document.getElementById('agendaForm');
+    const agendaPreview = document.getElementById('agendaPreview');
+    const deleteAgenda = document.getElementById('deleteAgenda');
+    const agendaSection = document.getElementById('agendaSection');
+
+    agendaAddBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      agendaPreview.classList.add('hidden');  // hide preview
+      agendaForm.classList.remove('hidden');  // show form
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!agendaSection.contains(e.target)) {
+        agendaForm.classList.add('hidden');     // hide form
+        agendaPreview.classList.remove('hidden'); // show preview
+      }
+    });
+
+    deleteAgenda.addEventListener('click', () => {
+      agendaForm.classList.add('hidden');
+      agendaPreview.classList.remove('hidden');
+    });
+</script>
+
+
+<script>
+    const bottomBar = document.getElementById('bottomBar');
+    let showThreshold = 80; // px from bottom of window
+
+    window.addEventListener('mousemove', (e) => {
+      const fromBottom = window.innerHeight - e.clientY;
+      if (fromBottom < showThreshold) {
+        bottomBar.classList.remove('opacity-0', 'pointer-events-none');
+        bottomBar.classList.add('opacity-100');
+      } else {
+        bottomBar.classList.remove('opacity-100');
+        bottomBar.classList.add('opacity-0', 'pointer-events-none');
+      }
+    });
+</script>
+<script>
+    const formData = new FormData();
+formData.append("file", fileInput.files[0]);
+
+fetch("/upload", {
+  method: "POST",
+  body: formData,
+});
+
+</script>
+
+
+
+</body>
+</html>
