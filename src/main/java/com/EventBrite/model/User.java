@@ -1,24 +1,29 @@
 package com.EventBrite.model;
 
-
 import jakarta.persistence.*;
 
 @Entity
-@Table(name =  "users")
-
-
+@Table(name = "users")
 public class User {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
     private String username;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Transient // Not stored in DB
     private String confirmPassword;
 
-    private String role; // 👈 Add this line
+    @Column(nullable = false)
+    private String role;
 
     // Constructors
     public User() {}
@@ -29,8 +34,16 @@ public class User {
         this.role = role;
     }
 
+    // Getters and Setters
 
-    @Column(unique = true)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -62,8 +75,12 @@ public class User {
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
     }
-    public String getRole() { return role; } // 👈 Add this
 
-    public void setRole(String role) { this.role = role; } // 👈 Add this
+    public String getRole() {
+        return role;
+    }
 
+    public void setRole(String role) {
+        this.role = role;
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,16 +41,48 @@ public class EventCreate {
         this.eventRepository = eventRepository;
     }
 
+
+
     @GetMapping("/manual")
     public String showCreateForm(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User user = userRepository.findByEmail(userDetails.getUsername())
+
+        String email;
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof DefaultOidcUser) {
+            email = ((DefaultOidcUser) principal).getEmail();
+        } else {
+            throw new RuntimeException("Unsupported user principal type: " + principal.getClass().getName());
+        }
+
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         model.addAttribute("user", user);
         model.addAttribute("event", new EventDisplay());
         return "createEvent";
+    }
+
+
+
+
+    @GetMapping("/event/{id}")
+    public String viewEvent(@PathVariable Long id, Model model) {
+        EventDisplay event = eventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        model.addAttribute("uploadsPath", "/uploads/");
+        if (event.getPriceVip() == null) event.setPriceVip(0.0);
+        if (event.getPriceRegular() == null) event.setPriceRegular(0.0);
+        if (event.getPricePopular() == null) event.setPricePopular(0.0);
+        if (event.getPriceSingle() == null) event.setPriceSingle(0.0);
+        model.addAttribute("event", event);
+        model.addAttribute("_csrf",
+                RequestContextHolder.getRequestAttributes().getAttribute("_csrf", 0));
+        return "eventDisplay";
     }
 
     @PostMapping("/manual")
@@ -58,13 +91,38 @@ public class EventCreate {
             BindingResult result,
             @RequestParam("imageFile") MultipartFile imageFile,
             @RequestParam("videoFile") MultipartFile videoFile,
+            @RequestParam(value = "isPaid", required = false) String isPaidStr,
+            @RequestParam(value = "paidType", required = false) String paidTypeStr,
+            @RequestParam(value = "priceVip", required = false) Double priceVip,
+            @RequestParam(value = "priceRegular", required = false) Double priceRegular,
+            @RequestParam(value = "pricePopular", required = false) Double pricePopular,
+            @RequestParam(value = "priceSingle", required = false) Double priceSingle,
             Model model) throws IOException {
 
         if (result.hasErrors()) {
             return "createEvent";
         }
 
-        // Handle file uploads
+        // Convert string to boolean for isPaid
+        event.setIsPaid("true".equalsIgnoreCase(isPaidStr));
+
+        // Convert paidType string to enum, if present
+        if (paidTypeStr != null && !paidTypeStr.isEmpty()) {
+            try {
+                event.setPaidType(EventDisplay.TicketType.valueOf(paidTypeStr));
+            } catch (IllegalArgumentException e) {
+                event.setPaidType(null);
+            }
+        } else {
+            event.setPaidType(null);
+        }
+
+        event.setPriceVip(priceVip);
+        event.setPriceRegular(priceRegular);
+        event.setPricePopular(pricePopular);
+        event.setPriceSingle(priceSingle);
+
+        // Handle file uploads as you already do
         if (!imageFile.isEmpty()) {
             String imagePath = saveFile(imageFile, "images");
             event.setImagePath(imagePath);
@@ -79,17 +137,7 @@ public class EventCreate {
         return "redirect:/event/" + savedEvent.getId();
     }
 
-    @GetMapping("/event/{id}")
-    public String viewEvent(@PathVariable Long id, Model model) {
-        EventDisplay event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        model.addAttribute("uploadsPath", "/uploads/");
-        model.addAttribute("event", event);
-        model.addAttribute("_csrf",
-                RequestContextHolder.getRequestAttributes().getAttribute("_csrf", 0));
-        return "event";
-    }
 
     @DeleteMapping("/event/{id}")
     @ResponseBody

@@ -16,74 +16,85 @@
 
 <div x-data="{ sidebarOpen: false }">
     <!-- Top Navigation Bar -->
-    <nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between bg-white shadow-md px-4 py-4">
-        <div class="flex items-center gap-4">
-            <img src="images/ev0.png" alt="Logo" class="w-24">
-        </div>
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-gray-100 to-gray-200 shadow px-6 py-4">
+        <div class="flex items-center justify-between">
 
-        <div class="flex items-center gap-4">
-            <!-- Create Button -->
-            <div x-data="{ open: false, showModal: false }" class="relative">
-                <button @click="open = !open" class="flex items-center gap-2 px-4 py-2 text-white bg-red-500 rounded-full hover:bg-red-600 transition">
-                    <i class="fas fa-plus"></i> Create
-                </button>
-                <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-50">
-                    <a href="#" @click.prevent="showModal = true; open = false" class="flex justify-between items-center px-4 py-2 text-sm hover:bg-gray-100">
-                        <i class="fas fa-calendar-alt text-blue-500"></i> <span>Event</span>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                </div>
+            <!-- Logo -->
+            <div class="flex items-center gap-4">
+                <img src="images/ev0.png" alt="Logo" class="w-36">
             </div>
 
-            <!-- User Dropdown -->
-            <div x-data="{ userDropdownOpen: false }" class="relative">
-                <button @click="userDropdownOpen = !userDropdownOpen" class="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-blue-100 text-gray-800 rounded-full transition">
-                    <i class="fa fa-user"></i>
-                    <i class="fas fa-chevron-down text-sm"></i>
-                </button>
-                <div x-show="userDropdownOpen" @click.away="userDropdownOpen = false" x-transition class="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-lg z-50">
-                    <div class="p-4 border-b text-sm">
-                        <div class="flex items-center gap-2">
-                            <i class="fa fa-envelope text-blue-500"></i>
-                            <span sec:authentication="name">user@example.com</span>
-                        </div>
+            <!-- Navigation Actions -->
+            <div class="flex items-center gap-4">
+
+                <!-- Create Button Dropdown -->
+                <div x-data="{ open: false, showModal: false }" class="relative">
+                    <button @click="open = !open" class="flex items-center gap-2 px-4 py-2 text-orange-400 border border-orange-400 rounded-full shadow transition-all">
+                        <i class="fas fa-plus"></i> <span>Create</span>
+                    </button>
+
+                    <div x-show="open" @click.away="open = false" x-transition
+                         class="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border z-50 overflow-hidden">
+                        <a href="#" @click.prevent="showModal = true; open = false"
+                           class="flex justify-between items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">
+            <span class="flex items-center gap-2">
+              <i class="fas fa-calendar-alt text-blue-500"></i> Event
+            </span>
+                            <i class="fas fa-chevron-right text-blue-900 text-xs"></i>
+                        </a>
                     </div>
-                    <a th:href="@{/attendance}" class="flex items-center px-4 py-3 text-sm hover:bg-gray-100">
-                        <i class="fa fa-exchange-alt mr-3"></i> Switch to Attendance
-                    </a>
-                    <a th:href="@{/account/settings}" class="flex items-center px-4 py-3 text-sm hover:bg-gray-100">
-                        <i class="fa fa-user mr-3"></i> Account Settings
-                    </a>
-                    <hr />
-                    <a th:href="@{/logout}" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50">
-                        <i class="fas fa-sign-out-alt mr-3"></i> Logout
-                    </a>
                 </div>
-            </div>
 
-            <!-- Mobile Sidebar Toggle -->
-            <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-2xl text-gray-700">
-                <i class="fas fa-bars"></i>
-            </button>
+                <!-- User Dropdown -->
+                <div x-data="{ userDropdownOpen: false }" class="relative">
+                    <button @click="userDropdownOpen = !userDropdownOpen"
+                            class="flex items-center gap-2 px-2 py-2 bg-gray-100 hover:bg-gray-200 text-blue-900 rounded-full shadow transition-all">
+                        <img class="w-10 h-10 rounded-full object-cover" th:src="@{/images/Z.png}" alt="User Avatar">
+                    </button>
+
+                    <div x-show="userDropdownOpen" @click.away="userDropdownOpen = false" x-transition
+                         class="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-lg z-50">
+                        <div class="p-4 border-b text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <i class="fa fa-envelope text-blue-500"></i>
+                                <span sec:authentication="name">user@example.com</span>
+                            </div>
+                        </div>
+                        <a th:href="@{/Attendee-login}" class="flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100">
+                            <i class="fa fa-exchange-alt mr-3"></i> Switch to Attendance
+                        </a>
+                        <a th:href="@{/account/settings}" class="flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100">
+                            <i class="fa fa-user mr-3"></i> Account Settings
+                        </a>
+                        <hr class="my-1" />
+                        <a th:href="@{/logout}" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                            <i class="fas fa-sign-out-alt mr-3"></i> Logout
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mobile Sidebar Toggle -->
+                <button @click="sidebarOpen = !sidebarOpen" class="md:hidden text-2xl text-gray-700 hover:text-indigo-600 transition">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+            </div>
         </div>
     </nav>
 
     <!-- Sidebar -->
-    <aside :class="sidebarOpen ? 'block' : 'hidden md:block'" class="fixed top-[4.5rem] left-0 z-40 w-64 h-[calc(100vh-4.5rem)] bg-gray-100 border-r">
-        <nav class="p-4 space-y-7">
+    <aside :class="sidebarOpen ? 'block' : 'hidden md:block'" class="fixed top-[4.5rem] left-0 z-40 w-64 h-[calc(100vh-4.5rem)] bg-gray-100 border-r mt-4">
+        <nav class="p-4 space-y-10">
             <a th:href="@{/home}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-home text-blue-500 w-5"></i><span class="ml-3">Home</span>
             </a>
-            <a th:href="@{/Event}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
-                <i class="fas fa-calendar-alt text-blue-500 w-5"></i><span class="ml-3">Events</span>
-            </a>
-            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+            <a th:href="@{/marketing}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-bullhorn text-blue-500 w-5"></i><span class="ml-3">Marketing</span>
             </a>
-            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+            <a th:href="@{/reports}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-chart-line text-blue-500 w-5"></i><span class="ml-3">Reports</span>
             </a>
-            <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+            <a th:href="@{/Settings}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-cog text-blue-500 w-5"></i><span class="ml-3">Settings</span>
             </a>
             <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
@@ -92,9 +103,14 @@
             <a href="#" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-ellipsis-h text-blue-500 w-5"></i><span class="ml-3">More</span>
             </a>
-            <a th:href="@{/logout}" class="flex items-center px-4 py-2 text-black hover:bg-red-100 hover:text-red-500 rounded-md">
-                <i class="fa fa-sign-out text-blue-500 w-5"></i><span class="ml-3">Logout</span>
+            <a th:href="@{/logout}"
+               class="flex items-center px-4 py-2 text-black rounded-md
+          hover:bg-red-100 hover:text-red-500 group">
+                <i class="fa fa-sign-out w-5 text-blue-500 group-hover:text-red-500"></i>
+                <span class="ml-3">Logout</span>
             </a>
+
+
         </nav>
     </aside>
 
@@ -407,51 +423,94 @@
 
             </div>
 
-
         </section>
-
-
-
 
 
 <br><br>
 
-
-            <!-- Quill CSS -->
-            <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
-            <section id="overviewSection"
+            <section id="Payment"
                      class="relative border-2 border-gray-300 hover:border-blue-500 cursor-pointer rounded-md max-w-4xl mx-auto bg-white transition-all duration-500 overflow-hidden h-auto px-6 py-8">
+
                 <i class="fa fa-plus absolute top-4 right-4 text-blue-600 text-lg bg-gray-100 px-3 py-2 rounded-full shadow z-20"></i>
 
-                <h2 class="text-2xl font-bold mb-4">Overview</h2>
-                <p class="font-medium text-gray-500">
-                    Use this section to provide more details about your event. You can include venue info, accessibility options, etc.
-                </p>
+                <h2 class="text-2xl font-bold mb-4">Payment</h2>
 
-                <!-- Expanded Area -->
-                <div id="extraContent" class="mt-6 hidden space-y-4">
-                    <p class="text-gray-600">Add more details about your event and include what people can expect if they attend.</p>
+                <!-- Hidden initially -->
+                <div id="paymentOptions" class="hidden mt-4">
 
-                    <!-- Quill Toolbar -->
-                    <div id="editorToolbar" class="border border-gray-300 rounded-t-lg bg-white"></div>
+                    <!-- Free / Paid Toggle -->
+                    <div class="flex gap-6 my-4">
+                        <label class="group relative flex items-center justify-between gap-4 px-5 py-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition duration-200 w-full sm:w-1/2">
+                            <div class="flex items-center gap-3">
+                                <i class="fa fa-tag text-gray-400 group-has-[input:checked]:text-blue-600 transition duration-200 text-lg"></i>
+                                <span class="text-gray-800 font-medium">Free</span>
+                            </div>
+                            <input type="radio" name="isPaid" value="false"
+                                   class="payment-radio form-radio text-blue-600 w-5 h-5" />
+                        </label>
 
-                    <!-- Quill Editor Container -->
-                    <div id="editorContent" class="border border-t-0 border-gray-300 rounded-b-lg bg-white h-48 overflow-auto"></div>
+                        <label class="group relative flex items-center justify-between gap-4 px-5 py-4 border border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition duration-200 w-full sm:w-1/2">
+                            <div class="flex items-center gap-3">
+                                <i class="fa fa-credit-card text-gray-400 group-has-[input:checked]:text-blue-600 transition duration-200 text-lg"></i>
+                                <span class="text-gray-800 font-medium flex items-center gap-2">
+                        Paid
+                        <span class="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">New</span>
+                    </span>
+                            </div>
+                            <input type="radio" name="isPaid" value="true"
+                                   class="payment-radio form-radio text-blue-600 w-5 h-5" />
+                        </label>
+                    </div>
 
-                    <div class="flex flex-wrap gap-4">
-                        <button class="px-4 py-2 border-2 border-gray-300 hover:border-blue-500 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
-                            <i class="fa fa-file mr-2"></i>Add text
-                        </button>
-                        <button class="px-4 py-2 border-2 border-gray-300 hover:border-blue-500 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
-                            <i class="fa fa-image mr-2"></i>Add image
-                        </button>
-                        <button class="px-4 py-2 border-2 border-gray-300 hover:border-blue-500 text-gray-700 rounded-md shadow-sm hover:bg-gray-200 transition">
-                            <i class="fa fa-video mr-2"></i>Add video
-                        </button>
+                    <!-- Paid Ticket Types with Custom Prices -->
+                    <div id="ticketTypeSection" class="hidden">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Define Ticket Types and Prices:</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- VIP -->
+                            <div class="flex flex-col border p-4 rounded hover:border-blue-500">
+                                <label class="flex items-center gap-2 mb-2">
+                                    <input type="radio" name="paidType" value="VIP" class="text-blue-600" />
+                                    <span>VIP</span>
+                                </label>
+                                <input type="number" name="priceVip" placeholder="Enter price for VIP"
+                                       class="vip-price px-3 py-2 border rounded focus:ring-1 focus:ring-blue-400" />
+                            </div>
+
+                            <!-- Regular -->
+                            <div class="flex flex-col border p-4 rounded hover:border-blue-500">
+                                <label class="flex items-center gap-2 mb-2">
+                                    <input type="radio" name="paidType" value="REGULAR" class="text-blue-600" />
+                                    <span>Regular</span>
+                                </label>
+                                <input type="number" name="priceRegular" placeholder="Enter price for Regular"
+                                       class="regular-price px-3 py-2 border rounded focus:ring-1 focus:ring-blue-400" />
+                            </div>
+
+                            <!-- Popular -->
+                            <div class="flex flex-col border p-4 rounded hover:border-blue-500">
+                                <label class="flex items-center gap-2 mb-2">
+                                    <input type="radio" name="paidType" value="POPULAR" class="text-blue-600" />
+                                    <span>Popular</span>
+                                </label>
+                                <input type="number" name="pricePopular" placeholder="Enter price for Popular"
+                                       class="popular-price px-3 py-2 border rounded focus:ring-1 focus:ring-blue-400" />
+                            </div>
+
+                            <!-- Single -->
+                            <div class="flex flex-col border p-4 rounded hover:border-blue-500">
+                                <label class="flex items-center gap-2 mb-2">
+                                    <input type="radio" name="paidType" value="SINGLE" class="text-blue-600" />
+                                    <span>Single</span>
+                                </label>
+                                <input type="number" name="priceSingle" placeholder="Enter price for Single"
+                                       class="single-price px-3 py-2 border rounded focus:ring-1 focus:ring-blue-400" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
+
+
 
 
 <br><br>
@@ -527,7 +586,7 @@
 
 
         <!-- Fixed Bottom Bar -->
-        <div id="bottomBar" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="bottomBar" class="bg-gradient-to-r from-blue-50 to-indigo-50 fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 shadow z-50 opacity-0 pointer-events-none transition-opacity duration-300">
             <div class="max-w-7xl mx-auto px-4 py-3 flex justify-end">
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-md shadow-md transition duration-200">
                     Save and continue
@@ -548,9 +607,16 @@
 </div>
 
 
-<!-- Upload Slider Script -->
+<style>
+    #sliderSection {
+      transition: background-image 1s ease-in-out;
+      background-size: cover;
+      background-position: center;
+    }
+</style>
+
 <script>
-    (function() {
+    (function () {
       const sliderSection = document.getElementById('sliderSection');
       const uploadSection = document.getElementById('uploadSection');
       const centerBox = document.getElementById('centerBox');
@@ -559,21 +625,28 @@
       const images = ["images/Back1.jpg", "images/back2.jpg", "images/Back3.jpg"];
       let index = 0;
       let expandedSlider = false;
+      let interval;
 
-      // Start slider
-      let interval = setInterval(() => {
-        if (!expandedSlider) {
+      function startSlider() {
+        interval = setInterval(() => {
           index = (index + 1) % images.length;
           sliderSection.style.backgroundImage = `url('${images[index]}')`;
-        }
-      }, 3000);
+        }, 4000);
+      }
+
+      function stopSlider() {
+        clearInterval(interval);
+      }
+
+      // Initial image
       sliderSection.style.backgroundImage = `url('${images[index]}')`;
+      startSlider();
 
       // Show upload UI
       sliderSection.addEventListener('click', (e) => {
         if (!expandedSlider) {
           expandedSlider = true;
-          clearInterval(interval);
+          stopSlider();
           sliderSection.classList.remove('h-96');
           sliderSection.classList.add('h-auto');
           sliderSection.style.backgroundImage = 'none';
@@ -582,6 +655,11 @@
           uploadSection.classList.remove('hidden');
           e.stopPropagation();
         }
+      });
+
+      // Prevent outside click close when inside uploadSection
+      uploadSection.addEventListener('click', (e) => {
+        e.stopPropagation();
       });
 
       // Click outside to reset
@@ -594,15 +672,12 @@
           sliderSection.classList.remove('h-auto');
           sliderSection.classList.add('h-96');
           sliderSection.style.backgroundImage = `url('${images[index]}')`;
-
-          interval = setInterval(() => {
-            index = (index + 1) % images.length;
-            sliderSection.style.backgroundImage = `url('${images[index]}')`;
-          }, 4000);
+          startSlider();
         }
       });
     })();
 </script>
+
 
 <!-- Event Form Toggle Script -->
 <script>
@@ -633,6 +708,8 @@
       });
     })();
 </script>
+
+
 
 <script>
     const section = document.getElementById('DateSection');
@@ -675,8 +752,46 @@
 </script>
 
 
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const paymentSection = document.getElementById("Payment");
+      const paymentOptions = document.getElementById("paymentOptions");
+      const ticketTypeSection = document.getElementById("ticketTypeSection");
+      const isPaidRadios = document.querySelectorAll('input[name="isPaid"]');
 
-<!-- Quill Script -->
+      // Toggle paymentOptions visibility when clicking the payment section
+      paymentSection.addEventListener("click", (e) => {
+        // Prevent toggling if clicking inside paymentOptions or on inputs inside it
+        if (paymentOptions.contains(e.target)) return;
+
+        if (paymentOptions.classList.contains("hidden")) {
+          paymentOptions.classList.remove("hidden");
+        } else {
+          paymentOptions.classList.add("hidden");
+        }
+      });
+
+      // Function to update ticketTypeSection visibility
+      function updateTicketTypeVisibility() {
+        const selected = Array.from(isPaidRadios).find(radio => radio.checked);
+        if (selected && selected.value === "true") {
+          ticketTypeSection.classList.remove("hidden");
+        } else {
+          ticketTypeSection.classList.add("hidden");
+        }
+      }
+
+      // Add change event to all isPaid radios
+      isPaidRadios.forEach(radio => {
+        radio.addEventListener("change", updateTicketTypeVisibility);
+      });
+
+      // Initialize on page load based on checked value
+      updateTicketTypeVisibility();
+    });
+</script>
+
+
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
 <script>

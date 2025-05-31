@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Venue</title>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="select-none">
+<!-- Top Navbar -->
+<nav x-data="{ mobileMenuOpen: false }"
+     class="fixed top-0 left-0 right-0 z-50 bg-indigo-50 shadow px-6 py-4">
+    <div class="flex items-center justify-between">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+            <img src="images/ev0.png" alt="Logo" class="w-36">
+        </div>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden md:flex gap-10 items-center cursor-pointer">
+            <a th:href="@{/Attendee-Home}" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+            <a th:href="@{/Event}" class="text-gray-700 hover:text-blue-600 font-medium">Events</a>
+            <a th:href="@{/Attendee-Tickets}" class="text-gray-700 hover:text-blue-600 font-medium">Tickets</a>
+            <a th:href="@{/Venue-Explore}" class="text-gray-700 hover:text-blue-600 font-medium">Explore Venues</a>
+            <a th:href="@{/attendee-logout}" class="text-gray-700 hover:text-red-600 font-medium">Logout</a>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen"
+                class="md:hidden text-2xl text-gray-700 hover:text-indigo-600 transition">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div x-show="mobileMenuOpen" x-transition class="md:hidden mt-4 space-y-2">
+        <a th:href="@{/Attendee-Home}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Home</a>
+        <a th:href="@{/Event}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Events</a>
+        <a th:href="@{/Attendee-Tickets}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Tickets</a>
+        <a th:href="@{/Venue-Explore}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Explore Venues</a>
+        <a th:href="@{/attendee-logout}" class="block text-gray-700 px-4 py-2 hover:bg-red-100 rounded">Logout</a>
+    </div>
+</nav>
+    <div class="pt-24">
+        <section class="mb-5">
+            <section class="px-4 mb-8">
+                <div>
+
+                    <h2 class="text-center text-2xl font-bold text-blue-900 after:block after:w-16 after:h-1 after:mt-2 after:mx-auto after:bg-blue-800">
+                        BOOK YOUR EVENT VENUE
+                    </h2>
+
+                </div>
+            </section>
+
+            <div class="grid gap-6 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 px-4">
+
+                <!-- Card 1 -->
+                <div class="bg-white shadow-md rounded-2xl overflow-hidden w-full flex flex-col justify-between">
+                    <img th:src="@{images/ev01.webp}" alt="Grand Vista" class="w-full h-56 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Grand Vista Event Center</h3>
+                        <p class="text-gray-700 mb-4">
+                            A spacious venue perfect for weddings and corporate events, featuring elegant interiors and premium amenities.
+                        </p>
+                        <a th:href="@{/eventArea}" class="mt-auto inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white shadow-md rounded-2xl overflow-hidden w-full flex flex-col justify-between">
+                    <img th:src="@{images/ev02.jpeg}" alt="The Pavilion" class="w-full h-56 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">The Pavilion Event Center</h3>
+                        <p class="text-gray-700 mb-4">
+                            A modern space for conferences, parties, and exhibitions with flexible layouts and expert support.
+                        </p>
+                        <a th:href="@{/eventArea}" class="mt-auto inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white shadow-md rounded-2xl overflow-hidden w-full flex flex-col justify-between">
+                    <img th:src="@{images/ev03.jpeg}" alt="Lakeside Bliss" class="w-full h-56 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Lakeside Bliss Event Center</h3>
+                        <p class="text-gray-700 mb-4">
+                            Enjoy scenic views and a charming setup, ideal for outdoor weddings and special celebrations.
+                        </p>
+                        <a th:href="@{/eventArea}" class="mt-auto inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                            Book Now
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <br><br>
+    <div class=" bg-white rounded-2xl shadow space-y-6">
+
+        <p class="text-gray-600 font-semibold text-center mb-6">Browse your curated event collections. Click an event to view more details or edit it.</p>
+
+        <!-- Grid of Events -->
+        <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Sample Event Card -->
+            <div class="bg-white rounded-lg overflow-hidden shadow hover:shadow-lg transition">
+                <img th:src="@{/images/A.jpeg}" alt="Event Image" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Music Festival 2025</h3>
+                    <p class="text-sm text-gray-600 mt-1">May 25, 2025 · Accra, Ghana</p>
+                    <div class="mt-4 flex justify-between items-center">
+                        <a th:href="@{/eventArea}" class="mt-auto inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Duplicate and customize for more cards -->
+            <div class="bg-white rounded-lg overflow-hidden shadow hover:shadow-lg transition">
+                <img th:src="@{/images/B.png}" alt="Event Image" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Tech Conference</h3>
+                    <p class="text-sm text-gray-600 mt-1">June 12, 2025 · Kumasi, Ghana</p>
+                    <div class="mt-4 flex justify-between items-center">
+                        <a th:href="@{/eventArea}" class="mt-auto inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg overflow-hidden shadow hover:shadow-lg transition">
+                <img th:src="@{/images/ev6.jpg}" alt="Event Image" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800"> Musical Concert</h3>
+                    <p class="text-sm text-gray-600 mt-1">June 5, 2025 · Kumasi, Ghana</p>
+                    <div class="mt-4 flex justify-between items-center">
+                        <a th:href="@{/eventArea}" class="mt-auto inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-blue-600 transition">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Add more event cards as needed -->
+        </div>
+
+        <section class="py-20 px-6 md:px-20 bg-white">
+            <div class="flex flex-col md:flex-row mb-12 items-start gap-8">
+                <!-- Text on the left -->
+                <div class="md:w-1/2 w-full flex flex-col space-y-6 text-left">
+                    <h2 class="text-xl md:text-2xl font-bold text-blue-950" th:text="'Event center Marketing Tools'">Grow your event</h2>
+                    <p class="text-gray-700 font-bold font-medium leading-relaxed mt-8" th:text="'Power your growth with our industry-leading event marketing platform, featuring time-saving social media ad tools, and reach your ideal audience with intelligent targeting and insights.'">
+                        Help attendees find more of what they love by creating collections of you related events.
+                    </p>
+                    <div class="flex sm:flex-row ">
+                        <a th:href="@{/manual}" class="bg-orange-600 px-6 py-3 text-white font-medium font-bold rounded-md hover:bg-orange-700 transition-colors" th:text="'Create your event'">Build a collection</a>
+                    </div>
+                </div>
+
+                <!-- Image on the right -->
+                <div class="md:w-1/2 w-full mt-20">
+                    <img th:src="@{images/bg1.png}" alt="Event Image" class="w-full object-contain">
+                </div>
+            </div>
+        </section>
+        <br><br>
+
+        <section class="py-20 px-6 md:px-20 bg-indigo-100">
+            <div class="flex flex-col md:flex-row items-start gap-8">
+                <!-- Left-aligned image -->
+                <div class="md:w-1/2 w-full mt-20">
+                    <img th:src="@{images/bg2.png}" alt="Event Image" class="w-full object-contain">
+                </div>
+
+                <!-- Right-aligned stacked text -->
+                <div class="md:w-1/2 w-full flex flex-col mb-12 space-y-6 text-right">
+                    <i class="fa fa-message text-center text-4xl text-blue-950"></i>
+                    <h2 class="text-xl md:text-2xl font-bold text-center text-blue-950" th:text="'Virtual Event'">Drive attendee engagement</h2>
+                    <p class="text-gray-500 font-medium text-center font-bold leading-relaxed" th:text="'Advanced online event management tools let you host interactive online event experiences that seamlessly integrate with Zoom, Facebook Live, YouTube, and more.'">
+                        Create branded pages for your collection, and engage more deeply with your audience.
+                    </p>
+                    <i class="fa fa-bullhorn text-center text-4xl text-blue-950"></i>
+                    <h2 class="text-xl md:text-2xl text-center font-bold text-blue-950" th:text="'Customizable event page'">Grow your audience</h2>
+                    <p class="text-gray-500 text-center font-medium font-bold leading-relaxed" th:text="'Save time and promote your entire calendar of events with a single automated campaign on Facebook and Instagram. Your ad automatically updates when you add events or sell out.'">
+                        Promote all the events in your collection with one link or social and campaign.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="bg-white w-full px-4 py-16 mt-8 text-center">
+        <h2 class="text-3xl  font-bold text-blue-950 mb-6" th:text="'Event Creation and Ticketing tools'">
+            Ready to get started?
+        </h2>
+
+        <a href="#"
+           class="inline-block bg-orange-500 text-white px-6 py-3 rounded-md hover:bg-orange-600 transition-colors"
+           th:text="'Grow your event'">
+            Build a collection
+        </a>
+    </div>
+
+</div>
+
+<!-- Traditional Footer Style with Warm Rose Colors -->
+<footer class="text-blue-900 py-16 px-6 md:px-24 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12">
+
+        <!-- Left Info Section -->
+        <div class="md:w-1/2">
+            <h3 class="text-xl font-semibold mb-3 text-blue-900 uppercase tracking-wide">About EventBrite</h3>
+            <p class="text-sm text-blue-900 mb-6 leading-relaxed max-w-lg">
+                Our Event Center system is dedicated to transforming lives through meaningful live experiences. Stay connected with us on social media and never miss out on our latest charity events and initiatives.
+            </p>
+            <div class="flex space-x-5 text-xl">
+                <a href="https://www.facebook.com/kweku.sam.5621" class="text-blue-700 hover:text-blue-900 transition" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://twitter.com/samuels48052304" class="text-blue-400 hover:text-blue-500 transition" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://instagram.com/Uhm_ricch" class="text-pink-500 hover:text-pink-600 transition" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://youtube.com/@samuelsam5556" class="text-red-500 hover:text-red-600 transition" aria-label="YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Newsletter Section -->
+        <div class="md:w-1/3 bg-white rounded-md p-6 shadow-md">
+            <h4 class="text-lg font-semibold mb-4 text-blue-600 uppercase tracking-wide">Newsletter</h4>
+            <form class="flex flex-col sm:flex-row gap-3" onsubmit="event.preventDefault(); alert('Subscribed!');">
+                <input
+                        type="email"
+                        required
+                        placeholder="Email address"
+                        class="w-full px-3 py-2 rounded border border-blue-500 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <button
+                        type="submit"
+                        class="bg-indigo-500 text-white font-semibold px-5 py-2 rounded text-sm hover:bg-gradient-to-r from-blue-500 to-indigo-500 transition"
+                >
+                    Subscribe
+                </button>
+            </form>
+            <p class="mt-2 text-xs text-blue-900">We respect your privacy. No spam ever.</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto mt-12 border-t border-gray-300 pt-6 text-center text-blue-900 text-sm tracking-wide">
+        &copy; 2024 <span class="font-semibold">Samuel Sam</span>. All rights reserved.
+    </div>
+</footer>
+
+</body>
+</html>

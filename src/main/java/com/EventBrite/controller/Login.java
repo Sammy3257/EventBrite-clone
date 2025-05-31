@@ -46,7 +46,7 @@ public class Login {
         Optional<User> user = userRepository.findByEmail(email);
         if (user != null) {
             session.setAttribute("loggedInUser", user);
-            return "redirect/home";
+            return "redirect:/home";
         } else {
             return "redirect:/login?error=true";
         }

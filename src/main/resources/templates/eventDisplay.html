@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <!-- Font Awesome, Tailwind, AlpineJS -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+
+<div class="relative z-10 bg-white p-6 rounded-xl shadow-md border border-gray-200 text-center" th:if="${event != null}">
+    <!-- Header -->
+
+    <h2 class="text-xl font-bold text-blue-900 mb-4" th:text="${event.title}">Event Title</h2>
+    <!-- Event Details -->
+    <div class="text-left space-y-4">
+        <div class="mb-4" th:if="${event.imagePath}">
+            <h3 class="text-lg font-semibold mt-10 mb-4">Event Image</h3>
+            <img th:src="@{'/uploads/' + ${event.imagePath}}"
+                 alt="Event Image"
+                 class="w-full max-h-96 object-cover rounded-lg shadow">
+        </div>
+        <div class="mb-4" th:if="${event.videoPath}">
+            <h3 class="text-lg font-semibold mt-10 mb-4">Event Video</h3>
+            <video controls class="w-full max-h-96">
+                <source th:src="@{'/uploads/' + ${event.videoPath}}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <p class="text-gray-600">
+            <i class="fas fa-calendar-day mr-2"></i>
+            Date: <span th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy')}"></span>
+        </p>
+        <p class="text-gray-600">
+            <i class="fas fa-clock mr-2"></i>
+            Time: <span th:text="${event.startTime}"></span> - <span th:text="${event.endTime}"></span>
+        </p>
+        <p class="text-gray-600">
+            <i class="fas fa-map-marker-alt mr-2"></i>
+            Location:
+            <span th:text="${event.locationDetails}"
+                  th:if="${event.locationType?.name() == 'VENUE'}"></span>
+            <span th:if="${event.locationType?.name() == 'ONLINE'}">Online Event</span>
+            <span th:if="${event.locationType?.name() == 'TBA'}">Location To Be Announced</span>
+        </p>
+        <section id="paymentDisplay" class="bg-white border border-gray-300 rounded-lg p-6 max-w-4xl  shadow-md mt-8">
+            <h2 class="text-2xl text-gray-600 font-semibold mb-4">Payment Information</h2>
+
+            <!-- Show if event is paid -->
+            <div th:if="${event.isPaid}" class="bg-white shadow-md rounded-md p-6 mt-6 mb-4">
+
+                <ul class="space-y-4 text-gray-700">
+                    <li th:if="${event.priceVip != null}" class="flex justify-between items-center border-b pb-2">
+                        <span class="font-medium text-gray-600">VIP</span>
+                        <span class="text-gray-800 font-bold">GHS <span th:text="${#numbers.formatDecimal(event.priceVip, 1, 2)}">0.00</span></span>
+                    </li>
+                    <li th:if="${event.priceRegular != null}" class="flex justify-between items-center border-b pb-2">
+                        <span class="font-medium text-gray-600">Regular</span>
+                        <span class="text-gray-800 font-bold">GHS <span th:text="${#numbers.formatDecimal(event.priceRegular, 1, 2)}">0.00</span></span>
+                    </li>
+                    <li th:if="${event.pricePopular != null}" class="flex justify-between items-center border-b pb-2">
+                        <span class="font-medium text-gray-600">Popular</span>
+                        <span class="text-gray-800 font-bold">GHS <span th:text="${#numbers.formatDecimal(event.pricePopular, 1, 2)}">0.00</span></span>
+                    </li>
+                    <li th:if="${event.priceSingle != null}" class="flex justify-between items-center">
+                        <span class="font-medium text-gray-600">Single</span>
+                        <span class="text-gray-800 font-bold">GHS <span th:text="${#numbers.formatDecimal(event.priceSingle, 1, 2)}">0.00</span></span>
+                    </li>
+                </ul>
+            </div>
+
+
+            <!-- Show if event is free -->
+            <div th:if="${!event.isPaid}">
+                <p class="text-green-600 font-semibold">This is a free event. No payment is required.</p>
+            </div>
+        </section>
+
+
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+            <h3 class="text-lg font-semibold mb-2">Event Summary</h3>
+            <p class="text-gray-600" th:text="${event.summary}"></p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

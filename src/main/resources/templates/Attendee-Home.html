@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Attendees</title>
+</head>
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    </style>
+  <body class="select-none">
+  <!-- Top Navbar -->
+  <nav x-data="{ mobileMenuOpen: false }"
+       class="fixed top-0 left-0 right-0 z-50 bg-indigo-50 shadow px-6 py-4">
+      <div class="flex items-center justify-between">
+
+          <!-- Logo -->
+          <div class="flex items-center gap-4">
+              <img src="images/ev0.png" alt="Logo" class="w-36">
+          </div>
+
+          <!-- Desktop Navigation Links -->
+          <div class="hidden md:flex gap-10 items-center cursor-pointer">
+              <a th:href="@{/Attendee-Home}" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+              <a th:href="@{/Event}" class="text-gray-700 hover:text-blue-600 font-medium">Events</a>
+              <a th:href="@{/Attendee-Tickets}" class="text-gray-700 hover:text-blue-600 font-medium">Tickets</a>
+              <a th:href="@{/Venue-Explore}" class="text-gray-700 hover:text-blue-600 font-medium">Explore Venues</a>
+              <a th:href="@{/attendee-logout}" class="text-gray-700 hover:text-red-600 font-medium">Logout</a>
+          </div>
+
+          <!-- Mobile Menu Toggle -->
+          <button @click="mobileMenuOpen = !mobileMenuOpen"
+                  class="md:hidden text-2xl text-gray-700 hover:text-indigo-600 transition">
+              <i class="fas fa-bars"></i>
+          </button>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div x-show="mobileMenuOpen" x-transition class="md:hidden mt-4 space-y-2">
+          <a th:href="@{/Attendee-Home}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Home</a>
+          <a th:href="@{/Event}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Events</a>
+          <a th:href="@{/Attendee-Tickets}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Tickets</a>
+          <a th:href="@{/Venue-Explore}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Explore Venues</a>
+          <a th:href="@{/attendee-logout}" class="block text-gray-700 px-4 py-2 hover:bg-red-100 rounded">Logout</a>
+      </div>
+  </nav>
+
+  <!-- Spacer to prevent content from being hidden under the navbar -->
+  <div class="pt-18">
+      <section id="sliderSection" class="relative max-w-7xl mx-auto overflow-hidden rounded-lg bg-white shadow-lg">
+          <!-- Image Container -->
+          <div id="imageSlider" class="flex overflow-x-auto scroll-smooth snap-x snap-mandatory  no-scrollbar">
+              <div class="snap-center flex-shrink-0 w-full relative">
+                  <img src="images/ev6.jpg" alt="Image 1" class="w-full h-[550px] object-cover rounded-lg shadow-lg" />
+                  <h3 class="absolute bottom-4 left-4 text-white bg-black bg-opacity-50 px-3 py-1 rounded text-lg font-semibold">
+                      View exciting event
+                  </h3>
+              </div>
+              <div class="snap-center flex-shrink-0 w-full relative">
+                  <img src="images/ev03.jpeg" alt="Image 2" class="w-full h-[550px] object-cover rounded-lg shadow-lg" />
+                  <h3 class="absolute bottom-4 left-4 text-white bg-black bg-opacity-50 px-3 py-1 rounded text-lg font-semibold">
+                      Book your event center
+                  </h3>
+              </div>
+              <div class="snap-center flex-shrink-0 w-full relative">
+                  <img src="images/Back3.jpg" alt="Image 3" class="w-full h-[550px] object-cover rounded-lg shadow-lg" />
+                  <h3 class="absolute bottom-4 left-4 text-white bg-black bg-opacity-50 px-3 py-1 rounded text-lg font-semibold">
+                      Enjoy our exciting events from our organizers
+                  </h3>
+              </div>
+          </div>
+
+          <!-- Left Button -->
+          <button id="prevBtn" class="absolute left-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-60 hover:bg-opacity-90 p-2 rounded-full shadow">
+              <i class="fas fa-chevron-left"></i>
+          </button>
+
+          <!-- Right Button -->
+          <button id="nextBtn" class="absolute right-2 top-1/2 -translate-y-1/2 bg-white bg-opacity-60 hover:bg-opacity-90 p-2 rounded-full shadow">
+              <i class="fas fa-chevron-right"></i>
+          </button>
+      </section>
+
+
+
+      <br><br>
+
+      <br>
+      <br>
+
+      <!-- Enhanced Booking Banner -->
+      <section>
+          <div class="w-full bg-gradient-to-r from-blue-50 to-indigo-50 ml-2 mr-2 rounded shadow-lg border-t border-blue-100">
+              <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                  <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                      <div class="text-center md:text-left">
+                          <h3 class="text-lg font-semibold text-gray-900 mb-1">
+                              Event Planning Made Easy
+                          </h3>
+                          <p class="text-gray-600 text-sm">
+                              Secure your perfect venue today and create unforgettable experiences
+                          </p>
+                      </div>
+
+                      <form th:action="@{/eventArea}" method="post">
+                          <button type="submit"
+                                  class="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-lg shadow-md hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fill-rule="evenodd"
+                                        d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                        clip-rule="evenodd" />
+                              </svg>
+                              Reserve Your Space
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      <br>
+      <section class="bg-white rounded-lg py-12">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 class="text-3xl font-bold text-gray-900 mb-8">Community Spotlight</h2>
+
+
+
+              <!-- Amanda Card -->
+              <div class="bg-white shadow-md rounded-2xl overflow-hidden">
+                  <img th:src="@{images/ev7.jpg}" alt="Guests with JFS picnic blankets" class="w-full h-56 object-cover">
+                  <div class="p-6">
+                      <h3 class="text-xl font-semibold text-gray-800 mb-2">Samuel Sam</h3>
+                      <p class="text-gray-700 mb-4">
+                          “What I really like about using Eventbrite for our events is a myriad of things. One, it's recognizable…”
+                      </p>
+                      <p class="text-sm text-gray-600 mb-4">
+                          — Samuel Sam, Program Director, Jewish Food Society
+                      </p>
+                      <a th:href="@{#}" class="text-indigo-600 font-medium hover:underline">Read article</a>
+                  </div>
+              </div>
+
+          </div>
+      </section>
+      <br>
+  </div>
+
+  <!-- Traditional Footer Style with Warm Rose Colors -->
+  <footer class="text-blue-900 py-16 px-6 md:px-24 border-t border-gray-200">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12">
+
+          <!-- Left Info Section -->
+          <div class="md:w-1/2">
+              <h3 class="text-xl font-semibold mb-3 text-blue-900 uppercase tracking-wide">About EventBrite</h3>
+              <p class="text-sm text-blue-900 mb-6 leading-relaxed max-w-lg">
+                  Our Event Center system is dedicated to transforming lives through meaningful live experiences. Stay connected with us on social media and never miss out on our latest charity events and initiatives.
+              </p>
+              <div class="flex space-x-5 text-xl">
+                  <a href="https://www.facebook.com/kweku.sam.5621" class="text-blue-700 hover:text-blue-900 transition" aria-label="Facebook">
+                      <i class="fab fa-facebook-f"></i>
+                  </a>
+                  <a href="https://twitter.com/samuels48052304" class="text-blue-400 hover:text-blue-500 transition" aria-label="Twitter">
+                      <i class="fab fa-twitter"></i>
+                  </a>
+                  <a href="https://instagram.com/Uhm_ricch" class="text-pink-500 hover:text-pink-600 transition" aria-label="Instagram">
+                      <i class="fab fa-instagram"></i>
+                  </a>
+                  <a href="https://youtube.com/@samuelsam5556" class="text-red-500 hover:text-red-600 transition" aria-label="YouTube">
+                      <i class="fab fa-youtube"></i>
+                  </a>
+              </div>
+          </div>
+
+          <!-- Right Newsletter Section -->
+          <div class="md:w-1/3 bg-white rounded-md p-6 shadow-md">
+              <h4 class="text-lg font-semibold mb-4 text-blue-600 uppercase tracking-wide">Newsletter</h4>
+              <form class="flex flex-col sm:flex-row gap-3" onsubmit="event.preventDefault(); alert('Subscribed!');">
+                  <input
+                          type="email"
+                          required
+                          placeholder="Email address"
+                          class="w-full px-3 py-2 rounded border border-blue-500 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  <button
+                          type="submit"
+                          class="bg-indigo-500 text-white font-semibold px-5 py-2 rounded text-sm hover:bg-gradient-to-r from-blue-500 to-indigo-500 transition"
+                  >
+                      Subscribe
+                  </button>
+              </form>
+              <p class="mt-2 text-xs text-blue-900">We respect your privacy. No spam ever.</p>
+          </div>
+      </div>
+
+      <div class="max-w-7xl mx-auto mt-12 border-t border-gray-300 pt-6 text-center text-blue-900 text-sm tracking-wide">
+          &copy; 2024 <span class="font-semibold">Samuel Sam</span>. All rights reserved.
+      </div>
+  </footer>
+
+
+  </body>
+
+
+<script>
+    const slider = document.getElementById('imageSlider');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const images = slider.querySelectorAll('img');
+    let currentIndex = 0;
+    let autoScrollInterval;
+
+    const scrollToIndex = (index) => {
+      slider.scrollTo({
+        left: index * slider.clientWidth,
+        behavior: 'smooth',
+      });
+    };
+
+    nextBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex + 1) % images.length;
+      scrollToIndex(currentIndex);
+      restartAutoScroll();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      scrollToIndex(currentIndex);
+      restartAutoScroll();
+    });
+
+    const startAutoScroll = () => {
+      autoScrollInterval = setInterval(() => {
+        currentIndex = (currentIndex + 1) % images.length;
+        scrollToIndex(currentIndex);
+      }, 7000); // Change every 4 seconds
+    };
+
+    const stopAutoScroll = () => clearInterval(autoScrollInterval);
+
+    const restartAutoScroll = () => {
+      stopAutoScroll();
+      startAutoScroll();
+    };
+
+    // Start auto-scrolling on page load
+    startAutoScroll();
+</script>
+
+
+</html>

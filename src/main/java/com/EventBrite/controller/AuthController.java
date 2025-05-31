@@ -9,27 +9,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.context.request.RequestContextHolder;
+
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 @Controller
 public class AuthController {
 
+    private final EventDisplayRepository eventRepository;
     private final UserRepository userRepository;
     private final UserService userService;
 
     @Autowired
-    public AuthController(UserRepository userRepository, UserService userService) {
+    public AuthController(EventDisplayRepository eventRepository, UserRepository userRepository, UserService userService) {
+        this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.userService = userService;
     }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @GetMapping("/signup")
     public String showSignupForm(Model model) {
@@ -55,48 +66,47 @@ public class AuthController {
 
     @GetMapping("/home")
     public String home(Model model) {
+        EventDisplay event = eventRepository.findById(1L) // or whatever ID makes sense
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
-            // Not logged in, redirect to login page or show error
             return "redirect:/login";
         }
 
         String email;
 
-        if (authentication.getPrincipal() instanceof UserDetails userDetails) {
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails userDetails) {
             // Local form login
             email = userDetails.getUsername();
 
-        } else if (authentication.getPrincipal() instanceof DefaultOidcUser oidcUser) {
+        } else if (principal instanceof DefaultOidcUser oidcUser) {
             // Google OAuth2 login
-            email = oidcUser.getEmail();
+            email = oidcUser.getAttribute("email");
 
         } else {
-            // Unknown principal type - handle gracefully
-            // For example, redirect to login or show error page
             return "redirect:/login";
         }
+
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
                     User newUser = new User();
                     newUser.setEmail(email);
-
-                    // Set a dummy password to satisfy non-null constraint
-                    newUser.setPassword("OAUTH_USER_" + UUID.randomUUID());
-
-                    // Optional: set default role and username
+                    newUser.setPassword(passwordEncoder.encode("oauth_placeholder_password"));
                     newUser.setRole("ROLE_USER");
-                    newUser.setUsername(email);  // or derive username differently
-
+                    newUser.setUsername(email);
                     return userRepository.save(newUser);
                 });
 
-
         model.addAttribute("user", user);
+        model.addAttribute("event", event);
         return "home";
     }
+
 
 
 
@@ -119,6 +129,17 @@ public class AuthController {
 
         return "event";
     }
+
+
+    @GetMapping("/reports/{id}")
+    public String reports(@PathVariable Long id, Model model) {
+        EventDisplay event = eventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        model.addAttribute("event", event);
+        return "reports";
+    }
+
 
 
 }

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Ticket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6 select-none">
+
+<div class="w-full max-w-xl space-y-10">
+
+    <!-- Hidden Prices Container -->
+    <div id="ticketPrices"
+         data-vip="50"
+         data-popular="40"
+         data-regular="30"
+         data-single="20"
+         style="display:none;"></div>
+
+    <!-- Form Section -->
+    <div id="formSection" class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+        <h2 class="text-lg font-bold mb-4 text-blue-900">Enter Your Information</h2>
+        <form id="userForm">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                <input type="text" id="fullName" class="mt-1 p-2 w-full border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                <input type="text" id="phone" class="mt-1 p-2 w-full border rounded" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" class="mt-1 p-2 w-full border rounded" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-3">Ticket Type</label>
+                <select id="ticketType" class="form-select w-full border rounded p-2" required>
+                    <option value="">-- Select Type --</option>
+                    <option value="FREE">Free</option>
+                    <option value="REGULAR">Regular</option>
+                    <option value="VIP">VIP</option>
+                    <option value="POPULAR">Popular</option>
+                    <option value="SINGLE">Single</option>
+                </select>
+            </div>
+            <button type="submit"
+                    class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                Proceed
+            </button>
+        </form>
+    </div>
+
+    <!-- Ticket Section -->
+    <div id="ticketSection" class="hidden bg-white p-6 rounded-xl shadow-md border border-gray-200 space-y-4">
+        <h2 id="eventTitle" class="text-xl font-bold text-blue-900 mb-4" th:text="${event.title}">Event Title</h2>
+        <hr class="mb-4">
+        <div class="space-y-2 text-gray-600">
+            <p><span class="font-semibold">Attendee:</span> <span id="displayName"></span></p>
+            <p><span class="font-semibold">Phone:</span> <span id="displayPhone"></span></p>
+            <p><span class="font-semibold">Email:</span> <span id="displayEmail"></span></p>
+            <p><span class="font-semibold">Ticket Type:</span> <span id="displayType"></span></p>
+            <p><span class="font-semibold">Price:</span> <span id="displayPrice"></span></p>
+            <p><span class="font-semibold">Reference:</span> <span id="displayRef"></span></p>
+            <p><span class="font-semibold">Date:</span> <span id="eventDate" th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy')}">Date</span></p>
+            <p><span class="font-semibold">Time:</span>
+                <span id="startTime" th:text="${event.startTime}">Start</span> -
+                <span id="endTime" th:text="${event.endTime}">End</span>
+            </p>
+            <p>
+                <span class="font-semibold">Location:</span>
+                <span id="venueLocation" th:if="${event.locationType?.name() == 'VENUE'}" th:text="${event.locationDetails}">Venue</span>
+                <span id="onlineLocation" th:if="${event.locationType?.name() == 'ONLINE'}">Online Event</span>
+                <span id="tbaLocation" th:if="${event.locationType?.name() == 'TBA'}">Location To Be Announced</span>
+            </p>
+        </div>
+
+        <!-- QR Code -->
+        <div class="pt-6 text-center">
+            <h3 class="text-lg font-semibold mb-2">Verification QR Code</h3>
+            <div id="qrcode" class="inline-block p-2 border border-gray-300 bg-gray-50 rounded"></div>
+        </div>
+
+        <!-- Download Button -->
+        <div class="text-center mt-4">
+            <button id="downloadBtn" class="hidden bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                Download Ticket (PDF)
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Paystack Integration -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<script>
+    document.getElementById('userForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById('fullName').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const ticketType = document.getElementById('ticketType').value;
+
+        if (!name || !phone || !email || !ticketType) {
+            alert("Please fill all required fields.");
+            return;
+        }
+
+        const pricesEl = document.getElementById("ticketPrices");
+        let amount = 0;
+        if (ticketType === "VIP") amount = parseFloat(pricesEl.dataset.vip || 0);
+        else if (ticketType === "POPULAR") amount = parseFloat(pricesEl.dataset.popular || 0);
+        else if (ticketType === "REGULAR") amount = parseFloat(pricesEl.dataset.regular || 0);
+        else if (ticketType === "SINGLE") amount = parseFloat(pricesEl.dataset.single || 0);
+
+        if (ticketType === "FREE") {
+            showTicket(name, phone, email, ticketType, "FREE", "N/A");
+        } else {
+            const handler = PaystackPop.setup({
+                key: 'pk_test_6c0d116ddc90751cb782f116f8191efc97816574', // Replace with your live key in production
+                email: email,
+                amount: amount * 100,
+                currency: "GHS",
+                callback: function (response) {
+                    showTicket(name, phone, email, ticketType, `GHS ${amount.toFixed(2)}`, response.reference);
+                },
+                onClose: function () {
+                    alert('Transaction cancelled');
+                }
+            });
+            handler.openIframe();
+        }
+    });
+
+    function showTicket(name, phone, email, type, price, reference) {
+        document.getElementById('formSection').classList.add('hidden');
+        document.getElementById('ticketSection').classList.remove('hidden');
+
+        document.getElementById('displayName').textContent = name;
+        document.getElementById('displayPhone').textContent = phone;
+        document.getElementById('displayEmail').textContent = email;
+        document.getElementById('displayType').textContent = type;
+        document.getElementById('displayPrice').textContent = price;
+        document.getElementById('displayRef').textContent = reference;
+
+        const title = document.getElementById("eventTitle").textContent.trim();
+        const date = document.getElementById("eventDate")?.textContent.trim() || "Unknown";
+        const start = document.getElementById("startTime")?.textContent.trim();
+        const end = document.getElementById("endTime")?.textContent.trim();
+
+        let location = "Unknown";
+        if (document.getElementById("venueLocation")) location = document.getElementById("venueLocation").textContent.trim();
+        else if (document.getElementById("onlineLocation")) location = "Online Event";
+        else if (document.getElementById("tbaLocation")) location = "To Be Announced";
+
+        const qrContent = `
+Event: ${title}
+Name: ${name}
+Phone: ${phone}
+Email: ${email}
+Ticket: ${type}
+Price: ${price}
+Reference: ${reference}
+Date: ${date}
+Time: ${start} - ${end}
+Location: ${location}`.trim();
+
+        const qrContainer = document.getElementById("qrcode");
+        qrContainer.innerHTML = "";
+        new QRCode(qrContainer, {
+            text: qrContent,
+            width: 160,
+            height: 160,
+        });
+
+        document.getElementById('downloadBtn').classList.remove('hidden');
+    }
+
+    // PDF download logic
+    function generatePDF() {
+        html2canvas(document.getElementById('ticketSection')).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            const width = pdf.internal.pageSize.getWidth();
+            const height = (canvas.height * width) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+            pdf.save("event_ticket.pdf");
+        });
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', generatePDF);
+</script>
+
+</body>
+</html>

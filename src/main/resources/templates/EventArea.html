@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Ghana Event Venue Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <style>#map { height: 100%; min-height: 400px; }</style>
+</head>
+<body class="bg-gray-100 min-h-screen select-none">
+<div x-data="{ sidebarOpen: false }">
+    <nav x-data="{ mobileMenuOpen: false }"
+         class="fixed top-0 left-0 right-0 z-[9999] bg-indigo-50 shadow px-6 py-4">
+        <div class="flex items-center justify-between">
+
+            <!-- Logo -->
+            <div class="flex items-center gap-4">
+                <img src="images/ev0.png" alt="Logo" class="w-36">
+            </div>
+
+            <!-- Desktop Navigation Links -->
+            <div class="hidden md:flex gap-10 items-center cursor-pointer">
+                <a th:href="@{/Attendee-Home}" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+                <a th:href="@{/Event}" class="text-gray-700 hover:text-blue-600 font-medium">Events</a>
+                <a th:href="@{/Attendee-Tickets}" class="text-gray-700 hover:text-blue-600 font-medium">Tickets</a>
+                <a th:href="@{/Venue-Explore}" class="text-gray-700 hover:text-blue-600 font-medium">Explore Venues</a>
+                <a th:href="@{/attendee-logout}" class="text-gray-700 hover:text-red-600 font-medium">Logout</a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button @click="mobileMenuOpen = !mobileMenuOpen"
+                    class="md:hidden text-2xl text-gray-700 hover:text-indigo-600 transition">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenuOpen" x-transition class="md:hidden mt-4 space-y-2">
+            <a th:href="@{/Attendee-Home}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Home</a>
+            <a th:href="@{/Event}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Events</a>
+            <a th:href="@{/Attendee-Tickets}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Tickets</a>
+            <a th:href="@{/Venue-Explore}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Explore Venues</a>
+            <a th:href="@{/attendee-logout}" class="block text-gray-700 px-4 py-2 hover:bg-red-100 rounded">Logout</a>
+        </div>
+    </nav>
+
+
+
+    <div class="max-w-7xl mx-auto px-4 mt-24">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-3xl font-bold text-blue-900">Explore Event Venues</h2>
+            <a th:href="@{/Attendee-Home}"
+               class="flex items-center gap-2 text-sm text-blue-700 border border-blue-500 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+
+        <div class="mb-6">
+            <input id="searchBox" class="w-full px-4 py-3 border border-blue-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:outline-none shadow-sm"
+                   placeholder="🔍 Search by location (e.g., Accra, Kumasi, Takoradi)" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Map -->
+            <div class="md:col-span-2 h-[500px] rounded-xl overflow-hidden border border-blue-200 shadow">
+                <div id="map" class="w-full h-full"></div>
+            </div>
+
+            <!-- Venue List -->
+            <div class="bg-white rounded-xl shadow-lg p-5 overflow-y-auto max-h-[500px] border border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Top Venues</h3>
+                <ul id="venueList" class="space-y-6 text-gray-700"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Traditional Footer Style with Warm Rose Colors -->
+<footer class="text-blue-900 py-16 px-6 md:px-24 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12">
+
+        <!-- Left Info Section -->
+        <div class="md:w-1/2">
+            <h3 class="text-xl font-semibold mb-3 text-blue-900 uppercase tracking-wide">About EventBrite</h3>
+            <p class="text-sm text-blue-900 mb-6 leading-relaxed max-w-lg">
+                Our Event Center system is dedicated to transforming lives through meaningful live experiences. Stay connected with us on social media and never miss out on our latest charity events and initiatives.
+            </p>
+            <div class="flex space-x-5 text-xl">
+                <a href="https://www.facebook.com/kweku.sam.5621" class="text-blue-700 hover:text-blue-900 transition" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://twitter.com/samuels48052304" class="text-blue-400 hover:text-blue-500 transition" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://instagram.com/Uhm_ricch" class="text-pink-500 hover:text-pink-600 transition" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://youtube.com/@samuelsam5556" class="text-red-500 hover:text-red-600 transition" aria-label="YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Newsletter Section -->
+        <div class="md:w-1/3 bg-white rounded-md p-6 shadow-md">
+            <h4 class="text-lg font-semibold mb-4 text-blue-600 uppercase tracking-wide">Newsletter</h4>
+            <form class="flex flex-col sm:flex-row gap-3" onsubmit="event.preventDefault(); alert('Subscribed!');">
+                <input
+                        type="email"
+                        required
+                        placeholder="Email address"
+                        class="w-full px-3 py-2 rounded border border-blue-500 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <button
+                        type="submit"
+                        class="bg-indigo-500 text-white font-semibold px-5 py-2 rounded text-sm hover:bg-gradient-to-r from-blue-500 to-indigo-500 transition"
+                >
+                    Subscribe
+                </button>
+            </form>
+            <p class="mt-2 text-xs text-blue-900">We respect your privacy. No spam ever.</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto mt-12 border-t border-gray-300 pt-6 text-center text-blue-900 text-sm tracking-wide">
+        &copy; 2024 <span class="font-semibold">Samuel Sam</span>. All rights reserved.
+    </div>
+</footer>
+<script>
+    const venues = [
+      { id: 1, name: "Accra International Conference Centre", area: "Accra", coords: [5.556, -0.1969], description: "A prime location in Accra for major conferences, concerts and exhibitions.", rating: 5 },
+      { id: 2, name: "University of Ghana, Legon", area: "Accra", coords: [5.655, -0.186], description: "A open space in Accra for major conferences, concerts and exhibitions.", rating: 5 },
+      { id: 3, name: "Golden Tulip Hotel Accra", area: "Accra", coords: [5.577, -0.184], description: "A prime location in Accra for major conferences, concerts and exhibitions.", rating: 5 },
+      { id: 4, name: "Labadi Beach Hotel", area: "Accra", coords: [5.561, -0.169], description: "A seaside luxury venue for top-tier events and entertainment.", rating: 5 },
+      { id: 5, name: "Ghana International Trade Fair Center", area: "Accra", coords: [5.578, -0.118], description: "Host of large exhibitions, fairs, and expos.", rating: 5 },
+      { id: 6, name: "Kempinski Hotel Gold Coast City", area: "Accra", coords: [5.558, -0.2005], description: "Luxury venue in Accra hosting corporate and entertainment events.", rating: 4 },
+      { id: 7, name: "Baba Yara Sports Stadium, Kumasi", area: "Kumasi", coords: [6.6884, -1.6244], description: "Great for sports, rallies, and large concerts in the Ashanti Region.", rating: 3 },
+      { id: 8, name: "Kumasi Culture Centre", area: "Kumasi", coords: [6.6884, -1.621], description: "Cultural hub in Kumasi for exhibitions, music, and traditional events.", rating: 3 },
+      { id: 9, name: "Takoradi Mall", area: "Takoradi", coords: [4.8998, -1.7752], description: "A regional venue for promotional events, markets, and shows.", rating: 3 },
+      { id: 10, name: "Best Western Plus Atlantic Hotel", area: "Takoradi", coords: [4.902, -1.767], description: "Seaside location for weddings, conferences, and social events.", rating: 4 },
+      { id: 11, name: "RayBow Hotel", area: "Takoradi", coords: [4.903, -1.766], description: "Ideal for social gatherings and meetings by the beach.", rating: 4 },
+      { id: 12, name: "Villa Beach Hotel", area: "Takoradi", coords: [4.904, -1.765], description: "Coastal resort venue with event space and entertainment.", rating: 4 },
+      { id: 13, name: "Akroma Plaza", area: "Takoradi", coords: [4.905, -1.764], description: "Multi-purpose event center in the Western Region.", rating: 4 },
+      { id: 14, name: "Lasenza", area: "Takoradi", coords: [4.905, -1.764], description: "Multi-purpose event center in the Western Region.", rating: 4 }
+    ];
+
+    const map = L.map('map').setView([7.9465, -1.0232], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    const venueMarkers = L.layerGroup().addTo(map);
+    let locationMarker;
+    const listContainer = document.getElementById("venueList");
+    const searchBox = document.getElementById("searchBox");
+
+    function updateMapMarkers(filteredVenues) {
+      venueMarkers.clearLayers();
+      filteredVenues.forEach(v => {
+        L.marker(v.coords)
+          .bindPopup(`<b>${v.name}</b><br>${v.area}`)
+          .addTo(venueMarkers);
+      });
+    }
+
+    function displayVenues(filteredVenues) {
+      listContainer.innerHTML = "";
+      if (filteredVenues.length === 0) {
+        listContainer.innerHTML = "<p class='text-gray-500'>No venues found for that area.</p>";
+        return;
+      }
+
+      filteredVenues.forEach(v => {
+        const li = document.createElement("li");
+        li.classList.add("pb-4", "border-b");
+          li.innerHTML = `
+  <a href="/venues/${v.id}" class="text-blue-600 underline font-bold text-lg hover:text-blue-800">${v.name}</a>
+  <p class="text-sm mt-1">${v.description}</p>
+  <div class="text-yellow-400 text-sm mt-1">${"★".repeat(v.rating)}${"☆".repeat(5 - v.rating)}</div>
+`;
+
+
+        listContainer.appendChild(li);
+      });
+
+      updateMapMarkers(filteredVenues);
+    }
+
+    displayVenues(venues);
+    searchBox.addEventListener("input", function () {
+      const query = this.value.trim().toLowerCase();
+      const filtered = venues.filter(v => v.area.toLowerCase().includes(query));
+      displayVenues(filtered);
+      if (filtered.length > 0) {
+        map.setView(filtered[0].coords, 12);
+      }
+    });
+</script>
+
+</body>
+</html>

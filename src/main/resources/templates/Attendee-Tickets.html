@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Tickets</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col" x-data="ticketApp() select-none">
+
+
+<!-- Top Navbar -->
+<nav x-data="{ mobileMenuOpen: false }"
+     class="fixed top-0 left-0 right-0 z-50 bg-indigo-50 shadow px-6 py-4">
+    <div class="flex items-center justify-between">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+            <img src="images/ev0.png" alt="Logo" class="w-36">
+        </div>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden md:flex gap-10 items-center cursor-pointer">
+            <a th:href="@{/Attendee-Home}" class="text-gray-700 hover:text-blue-600 font-medium">Home</a>
+            <a th:href="@{/Event}" class="text-gray-700 hover:text-blue-600 font-medium">Events</a>
+            <a th:href="@{/Attendee-Tickets}" class="text-gray-700 hover:text-blue-600 font-medium">Tickets</a>
+            <a th:href="@{/Venue-Explore}" class="text-gray-700 hover:text-blue-600 font-medium">Explore Venues</a>
+            <a th:href="@{/attendee-logout}" class="text-gray-700 hover:text-red-600 font-medium">Logout</a>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen"
+                class="md:hidden text-2xl text-gray-700 hover:text-indigo-600 transition">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div x-show="mobileMenuOpen" x-transition class="md:hidden mt-4 space-y-2">
+        <a th:href="@{/Attendee-Home}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Home</a>
+        <a th:href="@{/Event}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Events</a>
+        <a th:href="@{/Attendee-Tickets}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Tickets</a>
+        <a th:href="@{/Venue-Explore}" class="block text-gray-700 px-4 py-2 hover:bg-blue-100 rounded">Explore Venues</a>
+        <a th:href="@{/attendee-logout}" class="block text-gray-700 px-4 py-2 hover:bg-red-100 rounded">Logout</a>
+    </div>
+</nav>
+<main class="pt-24 pb-16 px-4 max-w-4xl mx-auto" x-data="ticketManager()">
+    <template x-if="tickets.length === 0">
+        <p class="text-center text-gray-600">You currently have no tickets.</p>
+    </template>
+
+    <div class="space-y-6">
+        <template x-for="ticket in tickets" :key="ticket.id">
+            <div class="border border-gray-300 rounded-lg p-5 bg-white shadow-sm">
+                <div class="flex justify-between items-center cursor-pointer" @click="toggleDetails(ticket.id)">
+                    <div>
+                        <h2 class="text-xl font-semibold text-blue-800" x-text="ticket.eventName"></h2>
+                        <p class="text-gray-600" x-text="ticket.date + ' | ' + ticket.time"></p>
+                        <p class="text-sm text-gray-500" x-text="'Seat: ' + ticket.seat"></p>
+                    </div>
+                    <div>
+            <span
+                    class="inline-block px-3 py-1 rounded-full text-sm font-semibold"
+                    :class="{
+                'bg-green-100 text-green-700': ticket.status === 'Confirmed',
+                'bg-yellow-100 text-yellow-700': ticket.status === 'Pending',
+                'bg-red-100 text-red-700': ticket.status === 'Cancelled'
+              }"
+                    x-text="ticket.status"
+            ></span>
+                    </div>
+                </div>
+
+                <!-- Expanded details -->
+                <div x-show="ticket.showDetails" x-transition class="mt-4 border-t border-gray-200 pt-4 space-y-3 text-gray-700">
+                    <p><strong>Ticket Type:</strong> <span x-text="ticket.type"></span></p>
+                    <p><strong>Location:</strong> <span x-text="ticket.location"></span></p>
+                    <p><strong>Order Number:</strong> <span x-text="ticket.orderNumber"></span></p>
+
+                    <!-- QR code placeholder -->
+                    <div class="my-3">
+                        <img :src="ticket.qrCodeUrl" alt="QR Code" class="w-32 h-32 mx-auto"/>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex space-x-4 justify-center">
+                        <button
+                                @click="downloadTicket(ticket.id)"
+                                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+                        >
+                            Download Ticket
+                        </button>
+                        <button
+                                @click="transferTicket(ticket.id)"
+                                class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition"
+                        >
+                            Transfer Ticket
+                        </button>
+                        <button
+                                @click="cancelTicket(ticket.id)"
+                                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                                :disabled="ticket.status !== 'Confirmed'"
+                        >
+                            Cancel Ticket
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="mt-16 bg-gray-50 p-6 rounded-lg shadow-inner">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-900">Ticket FAQs</h2>
+        <ul class="list-disc pl-5 space-y-2 text-gray-700">
+            <li>How do I download my ticket? Click the "Download Ticket" button next to your ticket.</li>
+            <li>Can I transfer my ticket to someone else? Yes, use the "Transfer Ticket" option.</li>
+            <li>What happens if I cancel my ticket? Depending on event policies, you may receive a refund.</li>
+            <li>Who can I contact for ticket support? Use our support page or contact info on the event website.</li>
+        </ul>
+    </section>
+
+    <script>
+        function ticketManager() {
+          return {
+            tickets: [
+              {
+                id: 1,
+                eventName: 'Awesome Event 2024',
+                date: 'July 15, 2024',
+                time: '6:00 PM',
+                seat: 'A12',
+                status: 'Confirmed', // Confirmed, Pending, Cancelled
+                type: 'VIP Pass',
+                location: 'Grand Hall, City Center',
+                orderNumber: 'ORD123456',
+                qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ORD123456',
+                showDetails: false
+              },
+              {
+                id: 2,
+                eventName: 'Music Fest 2024',
+                date: 'August 10, 2024',
+                time: '8:00 PM',
+                seat: 'B45',
+                status: 'Pending',
+                type: 'General Admission',
+                location: 'Open Field',
+                orderNumber: 'ORD654321',
+                qrCodeUrl: 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ORD654321',
+                showDetails: false
+              }
+            ],
+            toggleDetails(id) {
+              this.tickets = this.tickets.map(t => {
+                if(t.id === id) t.showDetails = !t.showDetails;
+                return t;
+              });
+            },
+            downloadTicket(id) {
+              alert(`Downloading ticket #${id} (this should trigger a real download in a full app)`);
+              // Implement real download logic here
+            },
+            transferTicket(id) {
+              alert(`Transfer ticket #${id} feature coming soon!`);
+              // Implement transfer logic or open modal here
+            },
+            cancelTicket(id) {
+              if(confirm('Are you sure you want to cancel this ticket?')) {
+                this.tickets = this.tickets.map(t => {
+                  if(t.id === id && t.status === 'Confirmed') {
+                    t.status = 'Cancelled';
+                  }
+                  return t;
+                });
+              }
+            }
+          }
+        }
+    </script>
+</main>
+
+<!-- Traditional Footer Style with Warm Rose Colors -->
+<footer class="text-blue-900 py-16 px-6 md:px-24 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-12">
+
+        <!-- Left Info Section -->
+        <div class="md:w-1/2">
+            <h3 class="text-xl font-semibold mb-3 text-blue-900 uppercase tracking-wide">About EventBrite</h3>
+            <p class="text-sm text-blue-900 mb-6 leading-relaxed max-w-lg">
+                Our Event Center system is dedicated to transforming lives through meaningful live experiences. Stay connected with us on social media and never miss out on our latest charity events and initiatives.
+            </p>
+            <div class="flex space-x-5 text-xl">
+                <a href="https://www.facebook.com/kweku.sam.5621" class="text-blue-700 hover:text-blue-900 transition" aria-label="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://twitter.com/samuels48052304" class="text-blue-400 hover:text-blue-500 transition" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://instagram.com/Uhm_ricch" class="text-pink-500 hover:text-pink-600 transition" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://youtube.com/@samuelsam5556" class="text-red-500 hover:text-red-600 transition" aria-label="YouTube">
+                    <i class="fab fa-youtube"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Newsletter Section -->
+        <div class="md:w-1/3 bg-white rounded-md p-6 shadow-md">
+            <h4 class="text-lg font-semibold mb-4 text-blue-600 uppercase tracking-wide">Newsletter</h4>
+            <form class="flex flex-col sm:flex-row gap-3" onsubmit="event.preventDefault(); alert('Subscribed!');">
+                <input
+                        type="email"
+                        required
+                        placeholder="Email address"
+                        class="w-full px-3 py-2 rounded border border-blue-500 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <button
+                        type="submit"
+                        class="bg-indigo-500 text-white font-semibold px-5 py-2 rounded text-sm hover:bg-gradient-to-r from-blue-500 to-indigo-500 transition"
+                >
+                    Subscribe
+                </button>
+            </form>
+            <p class="mt-2 text-xs text-blue-900">We respect your privacy. No spam ever.</p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto mt-12 border-t border-gray-300 pt-6 text-center text-blue-900 text-sm tracking-wide">
+        &copy; 2024 <span class="font-semibold">Samuel Sam</span>. All rights reserved.
+    </div>
+</footer>
+
+<!-- Alpine.js Component -->
+<script>
+    function ticketApp() {
+        return {
+            processing: false,
+            tickets: [
+                { id: 1, name: 'General Admission', description: 'Access to the event hall.', price: 50, quantity: 0 },
+                { id: 2, name: 'VIP Pass', description: 'Priority entry + VIP lounge.', price: 120, quantity: 0 },
+                { id: 3, name: 'Student Ticket', description: 'Discounted ticket for students.', price: 30, quantity: 0 }
+            ],
+            increase(id) {
+                const t = this.tickets.find(t => t.id === id);
+                if (t) t.quantity++;
+            },
+            decrease(id) {
+                const t = this.tickets.find(t => t.id === id);
+                if (t && t.quantity > 0) t.quantity--;
+            },
+            total() {
+                return this.tickets.reduce((sum, t) => sum + (t.price * t.quantity), 0);
+            },
+            checkout() {
+                if (this.total() > 0) {
+                    this.processing = true;
+                    const order = this.tickets.filter(t => t.quantity > 0);
+                    fetch('/start-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tickets: order, total: this.total() })
+                    }).then(res => res.json())
+                      .then(data => window.location.href = data.redirectUrl)
+                      .catch(() => {
+                          alert('Error initiating payment');
+                          this.processing = false;
+                      });
+                } else {
+                    alert('Please select at least one ticket.');
+                }
+            }
+        };
+    }
+</script>
+
+</body>
+</html>
