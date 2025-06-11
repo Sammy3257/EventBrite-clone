@@ -54,17 +54,4 @@ public class Login {
         }
     }
 
-
-//    private static final String ADMIN_USERNAME = "admin";
-//    private static final String ADMIN_PASSWORD = "admin123";
-//
-//    @PostMapping("/login")
-//    public String doLogin(@RequestParam String username, @RequestParam String password, Model model) {
-//        if (username.equals(ADMIN_USERNAME) && password.equals(ADMIN_PASSWORD)) {
-//            return "redirect:/Admin";
-//        }
-//        else {
-//            return "redirect:/login?error=true";
-//        }
-//    }
 }

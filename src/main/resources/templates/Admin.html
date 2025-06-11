@@ -54,9 +54,6 @@
                         </div>
                     </div>
 
-                    <a href="#" class="flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100">
-                        <i class="fa fa-exchange-alt mr-3"></i> Switch to Attendance
-                    </a>
 
                     <!-- Open Profile Settings Modal -->
                     <button @click="$store.profile.profileModalOpen = true; userDropdownOpen = false"
@@ -121,24 +118,24 @@
     </div>
 
     <!-- Admin Sidebar -->
-    <aside :class="sidebarOpen ? 'block' : 'hidden md:block'" class="fixed top-[4.5rem] left-0 z-40 w-64 h-[calc(100vh-4.5rem)] bg-gray-100 border-r pt-3">
-        <nav class="p-4 space-y-6 text-sm">
-            <a th:href="@{/admin/dashboard}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+    <aside class="fixed top-[4.5rem] left-0 z-40 w-64 h-[calc(100vh-4.5rem)] bg-gray-100 border-r pt-3">
+        <nav class="p-4 space-y-8 text-m">
+            <a th:href="@{/Admin}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-tachometer-alt text-blue-500 w-5"></i><span class="ml-3">Dashboard</span>
             </a>
-            <a th:href="@{/admin/events}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+            <a th:href="@{/eventManagement}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-calendar-check text-blue-500 w-5"></i><span class="ml-3">Manage Events</span>
             </a>
-            <a th:href="@{/admin/users}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+            <a th:href="@{/UserManagement}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-users text-blue-500 w-5"></i><span class="ml-3">Users</span>
             </a>
-            <a th:href="@{/admin/tickets}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+            <a th:href="@{/TicketsManagement}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-ticket-alt text-blue-500 w-5"></i><span class="ml-3">Tickets</span>
             </a>
-            <a th:href="@{/admin/reports}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+            <a th:href="@{/AdminReport}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-chart-bar text-blue-500 w-5"></i><span class="ml-3">Reports</span>
             </a>
-            <a th:href="@{/admin/settings}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+            <a th:href="@{/AdminSettings}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
                 <i class="fas fa-cogs text-blue-500 w-5"></i><span class="ml-3">Settings</span>
             </a>
             <hr />
@@ -212,4 +209,23 @@
 </div>
 
 </body>
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('profile', {
+            profileModalOpen: false,
+            imageUrl: 'https://via.placeholder.com/100',
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.imageUrl = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    });
+</script>
+
 </html>

@@ -1,10 +1,273 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml"
+      xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Report</title>
+
+    <!-- Font Awesome, Tailwind, AlpineJS -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="select-none">
+
+<div x-data="{ sidebarOpen: false, userDropdownOpen: false }" class="min-h-screen">
+
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-gray-100 to-gray-200 shadow px-6 py-4 flex items-center justify-between">
+
+
+        <!-- Logo -->
+        <div class="flex items-center gap-4">
+            <img th:src="@{/images/ev0.png}" alt="Logo" class="w-36" />
+        </div>
+
+        <h2 class="text-2xl font-semibold ">Admin Portal</h2>
+        <!-- Navigation Actions -->
+        <div class="flex items-center gap-4">
+            <!-- Create Button Dropdown -->
+            <div x-data="{ open: false }" class="relative">
+
+            </div>
+
+            <!-- User Dropdown -->
+            <div class="relative" @keydown.escape="userDropdownOpen = false">
+                <!-- Avatar Button -->
+                <button @click="userDropdownOpen = !userDropdownOpen"
+                        class="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-blue-900 rounded-full shadow transition-all">
+                    <img :src="$store.profile.imageUrl || 'https://via.placeholder.com/40'"
+                         alt="User Avatar"
+                         class="w-10 h-10 rounded-full object-cover" />
+                </button>
+
+                <!-- Dropdown -->
+                <div x-show="userDropdownOpen" @click.away="userDropdownOpen = false" x-transition
+                     class="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-lg z-50">
+                    <div class="p-4 border-b text-sm text-gray-700">
+                        <div class="flex items-center gap-2">
+                            <i class="fa fa-envelope text-blue-500"></i>
+                            <span>user@example.com</span>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Open Profile Settings Modal -->
+                    <button @click="$store.profile.profileModalOpen = true; userDropdownOpen = false"
+                            class="w-full text-left flex items-center px-4 py-3 text-sm text-gray-800 hover:bg-gray-100">
+                        <i class="fa fa-user mr-3"></i> Account Settings
+                    </button>
+
+                    <hr class="my-1" />
+
+                    <a href="#" class="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50">
+                        <i class="fas fa-sign-out-alt mr-3"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Spacer for fixed navbar -->
+    <div class="h-20"></div>
+
+    <!-- Profile Settings Modal -->
+    <div x-show="$store.profile.profileModalOpen" x-transition
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+
+        <div @click.away="$store.profile.profileModalOpen = false"
+             class="bg-white w-full max-w-md mx-auto rounded-xl shadow-lg p-6 space-y-5">
+
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-semibold">Edit Profile</h2>
+                <button @click="$store.profile.profileModalOpen = false" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Profile Image with Preview and Upload -->
+            <div class="flex flex-col items-center">
+                <label class="mt-2 text-sm text-blue-600 cursor-pointer hover:underline">
+                    <img :src="$store.profile.imageUrl || 'https://via.placeholder.com/100'"
+                         class="w-24 h-24 rounded-full object-cover border-2 border-blue-500" />
+
+                    <input type="file" class="hidden" @change="$store.profile.handleImageUpload($event)" />
+                </label>
+            </div>
+
+            <!-- Form -->
+            <form class="space-y-3" @submit.prevent="alert('Profile saved! You can hook this up to your backend!')">
+                <input type="text" placeholder="Full Name" class="w-full p-2 border rounded" required />
+                <input type="email" placeholder="Email" class="w-full p-2 border rounded" required />
+                <input type="text" placeholder="Bio" class="w-full p-2 border rounded" required />
+
+
+
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" @click="$store.profile.profileModalOpen = false"
+                            class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Sidebar -->
+    <aside class="fixed top-[4.5rem] left-0 z-40 w-64 h-[calc(100vh-4.5rem)] bg-gray-100 border-r pt-3">
+        <nav class="p-4 space-y-8 text-m">
+            <a th:href="@{/Admin}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-tachometer-alt text-blue-500 w-5"></i><span class="ml-3">Dashboard</span>
+            </a>
+            <a th:href="@{/eventManagement}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-calendar-check text-blue-500 w-5"></i><span class="ml-3">Manage Events</span>
+            </a>
+            <a th:href="@{/UserManagement}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-users text-blue-500 w-5"></i><span class="ml-3">Users</span>
+            </a>
+            <a th:href="@{/TicketsManagement}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-ticket-alt text-blue-500 w-5"></i><span class="ml-3">Tickets</span>
+            </a>
+            <a th:href="@{/AdminReport}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-chart-bar text-blue-500 w-5"></i><span class="ml-3">Reports</span>
+            </a>
+            <a th:href="@{/AdminSettings}" class="flex items-center px-4 py-2 text-black hover:bg-blue-100 rounded-md">
+                <i class="fas fa-cogs text-blue-500 w-5"></i><span class="ml-3">Settings</span>
+            </a>
+            <hr />
+            <a th:href="@{/logout}"
+               class="flex items-center px-4 py-2 text-black rounded-md hover:bg-red-100 hover:text-red-500 group">
+                <i class="fas fa-sign-out-alt text-blue-500 group-hover:text-red-500 w-5"></i><span class="ml-3">Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Main Content Area -->
+    <main class="ml-64 mt-2 p-6">
+
+        <div class="space-y-8">
+
+
+            </div>
+
+            <!-- Revenue Breakdown Chart -->
+            <div class="bg-white rounded-2xl shadow p-6">
+                <h3 class="text-xl font-semibold mb-4">Revenue by Ticket Type</h3>
+                <canvas id="revenueChart"></canvas>
+            </div>
+
+            <!-- User Funnel -->
+            <div class="bg-white rounded-2xl shadow p-6">
+                <h3 class="text-xl font-semibold mb-4">User Behavior Funnel</h3>
+                <canvas id="funnelChart"></canvas>
+            </div>
+
+            <!-- Detailed Sales Table -->
+            <div class="bg-white rounded-2xl shadow p-6 overflow-x-auto">
+                <h3 class="text-xl font-semibold mb-4">Event Sales Report</h3>
+                <table class="min-w-full text-left border">
+                    <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-3 border">Event</th>
+                        <th class="p-3 border">Date</th>
+                        <th class="p-3 border">Tickets Sold</th>
+                        <th class="p-3 border">Revenue</th>
+                        <th class="p-3 border">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="hover:bg-gray-50" th:each="event : ${events}">
+                        <td class="p-3 border" th:text="${event.title}">Event Name</td>
+                        <td class="p-3 border" th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy')}">Event Date</td>
+
+                        <!-- Tickets Sold -->
+                        <td class="p-3 border" th:text="${ticketMap[event.id]?.size()}">0</td>
+
+                        <!-- Revenue -->
+                        <td class="p-3 border" th:text="'$' + (${eventRevenueMap[event.id]} ?: 0.00)">$0.00</td>
+
+                        <!-- Status -->
+                        <td class="p-3 border">
+                            Status
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        <br>
+
+    </main>
+        </div>
+
 
 </body>
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('profile', {
+            profileModalOpen: false,
+            imageUrl: 'https://via.placeholder.com/100',
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.imageUrl = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+    });
+</script>
+
+<script>
+    // Revenue Chart
+    new Chart(document.getElementById('revenueChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Standard', 'VIP', 'Group', 'Student'],
+        datasets: [{
+          label: 'Revenue ($)',
+          data: [12000,9000, 6000,4000],
+          backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899']
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+    // Funnel Chart (use horizontal bar as funnel alternative)
+    new Chart(document.getElementById('funnelChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Visited Page', 'Viewed Tickets', 'Purchased', 'Checked In'],
+        datasets: [{
+          label: 'Users',
+          data: [10000, 4800, 2400, 1900],
+          backgroundColor: '#6366f1'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        scales: {
+          x: { beginAtZero: true }
+        }
+      }
+    });
+</script>
+
+
 </html>

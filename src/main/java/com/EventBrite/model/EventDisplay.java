@@ -81,6 +81,8 @@ public class EventDisplay {
     private Double pricePopular;
     private Double priceSingle;
 
+
+
     // ENUMS
     public enum LocationType {
         VENUE, ONLINE, TBA
