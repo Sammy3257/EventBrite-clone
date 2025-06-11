@@ -3,6 +3,7 @@ package com.EventBrite.controller;
 import com.EventBrite.model.User;
 import com.EventBrite.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,8 @@ import java.util.Optional;
 @Controller
 public class Login {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public Login(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -44,11 +46,25 @@ public class Login {
             Model model
     ) {
         Optional<User> user = userRepository.findByEmail(email);
-        if (user != null) {
+        if (user.isPresent()) {
             session.setAttribute("loggedInUser", user);
             return "redirect:/home";
         } else {
             return "redirect:/login?error=true";
         }
     }
+
+
+//    private static final String ADMIN_USERNAME = "admin";
+//    private static final String ADMIN_PASSWORD = "admin123";
+//
+//    @PostMapping("/login")
+//    public String doLogin(@RequestParam String username, @RequestParam String password, Model model) {
+//        if (username.equals(ADMIN_USERNAME) && password.equals(ADMIN_PASSWORD)) {
+//            return "redirect:/Admin";
+//        }
+//        else {
+//            return "redirect:/login?error=true";
+//        }
+//    }
 }
