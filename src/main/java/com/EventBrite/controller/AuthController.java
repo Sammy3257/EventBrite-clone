@@ -66,8 +66,9 @@ public class AuthController {
 
     @GetMapping("/home")
     public String home(Model model) {
-        EventDisplay event = eventRepository.findById(1L) // or whatever ID makes sense
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+        EventDisplay event = (EventDisplay) eventRepository.findTopByOrderByIdDesc()
+                .orElseThrow(() -> new RuntimeException("No events found"));
+
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

@@ -2,13 +2,18 @@ package com.EventBrite.controller;
 
 import com.EventBrite.model.EventDisplay;
 import com.EventBrite.model.TicketOption;
+import com.EventBrite.model.User;
 import com.EventBrite.repository.EventDisplayRepository;
 import com.EventBrite.repository.TicketOptionRepository;
 import com.EventBrite.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,13 +53,24 @@ public class AdminController {
     public String AdminSettings(Model model){
         return "AdminSettings";
     }
-    @GetMapping("eventManagement")
+
+    @PreAuthorize("hasRole('USER', 'ADMIN')")
+    @GetMapping("/eventManagement")
     public String eventManagement(Model model){
+        model.addAttribute("event", eventDisplayRepository.findAll());
         return "eventManagement";
+    }
+
+    @PostMapping("/eventManagement/delete/{id}")
+    public String deleteEvent(@PathVariable Long id){
+        eventDisplayRepository.deleteById(id);
+        return "redirect:/eventManagement";
     }
 
     @GetMapping("/UserManagement")
     public String UserManagement(Model model){
+        List<User> users = userRepository.findAll();
+        model.addAttribute("users", users);
         return "UserManagement";
     }
 
